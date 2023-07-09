@@ -53,6 +53,8 @@ export function addProgramEditting(state) {
     const targetArr = state.programs[name];
     targetArr.splice(index, 1);
 
+    if (state.programs[name].length === 0 && name !== "main") delete state.programs[name];
+
     removed = true;
     dragged = true;
   })
@@ -93,11 +95,6 @@ export function addProgramEditting(state) {
   })
 
   listener("mouseup", "", e => {
-    for (const prog in state.programs) {
-      if (prog === "main") continue;
-
-      if (state.programs[prog].length === 0) delete state.programs[prog];
-    }
 
     removed = false;
     fromToolbox = false;

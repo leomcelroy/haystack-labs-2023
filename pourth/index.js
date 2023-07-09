@@ -15,6 +15,12 @@ const STATE = {
     },
     { 
       color: "blue", 
+      type: "number",
+      value: 1,
+      icon: "N",
+    },
+    { 
+      color: "blue", 
       type: "macro",
       value: "",
       sides: 32,
@@ -170,6 +176,11 @@ const EDITORS = {
   `,
   "macro": (value) => html`
     <div>macro name: ${value.value}</div>
+    <input @input=${e => value.value = e.target.value} .value=${value.value}/>
+  `,
+  "number": (value) => html`
+    <div>number value: ${value.value}</div>
+    <input @input=${e => value.value = e.target.value} .value=${value.value}/>
   `,
 }
 
