@@ -77,7 +77,7 @@ export function addProgramEditting(state) {
 
     const targetArr = state.programs[hoverId.name];
 
-    insertAtIndex(targetArr, state.dragId.data, Number(el.dataset.index));
+    insertAtIndex(targetArr, JSON.parse(JSON.stringify(state.dragId.data)), Number(el.dataset.index));
   
   })
 
