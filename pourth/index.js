@@ -90,6 +90,16 @@ const STATE = {
       type: "compose",
       icon: "C"
     },
+    { 
+      color: "red", 
+      type: "multiply",
+      icon: "x"
+    },
+    { 
+      color: "red", 
+      type: "plus",
+      icon: "plus"
+    },
   ],
   programs: {
     "main": [ 
@@ -210,7 +220,7 @@ const box = (box, index) => html`
     data-index=${index}
     style=${`
       background: ${box.color};
-      background-image: url('/icons/${box.icon ?? "default"}.png'); 
+      background-image: url('./icons/${box.icon ?? "default"}.png'); 
       background-size: cover; 
       background-position: center;
       border: 1px solid black;
@@ -229,7 +239,7 @@ const draggableBox = (box, index, name) => {
       data-program-name=${name}
       style=${`
         background: ${box.color};
-        background-image: url('/icons/${box.icon ?? "default"}.png'); 
+        background-image: url('./icons/${box.icon ?? "default"}.png'); 
         background-size: cover; 
         background-position: center;
         border: 1px solid black;
@@ -270,7 +280,7 @@ const drawDragged = (dragged, mouse) => dragged === null ? "" : html`
       width: 50px;
       height: 50px;
       background: ${dragged.data.color};
-      background-image: url('/icons/${dragged.data.icon ?? "default"}.png'); 
+      background-image: url('./icons/${dragged.data.icon ?? "default"}.png'); 
       background-size: cover; 
       background-position: center;
       border: 1px solid black;

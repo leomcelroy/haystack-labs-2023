@@ -11,8 +11,8 @@ export function addProgramEditting(state) {
   listener("mousedown", ".box", (e, trigger) => {
     const index = Number(trigger.dataset.index);
     const data = state.boxes[index];
-    const shiftX = event.clientX - trigger.getBoundingClientRect().left;
-    const shiftY = event.clientY - trigger.getBoundingClientRect().top;
+    const shiftX = e.clientX - trigger.getBoundingClientRect().left;
+    const shiftY = e.clientY - trigger.getBoundingClientRect().top;
 
     state.dragId = {
       name: "",
@@ -29,8 +29,8 @@ export function addProgramEditting(state) {
     const index = Number(trigger.dataset.index);
     const name = trigger.dataset.programName;
     const data = state.programs[name][index];
-    const shiftX = event.clientX - trigger.getBoundingClientRect().left;
-    const shiftY = event.clientY - trigger.getBoundingClientRect().top;
+    const shiftX = e.clientX - trigger.getBoundingClientRect().left;
+    const shiftY = e.clientY - trigger.getBoundingClientRect().top;
 
     state.dragId = {
       name,
