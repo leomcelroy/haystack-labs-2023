@@ -167,11 +167,11 @@ export function runProgram({ programs }) {
           return Math.sin((t+phase) * frequency * Math.PI * 2)*amplitude + shift;
         });
       }else if (type == 'bezier'){
-        let {start,end,handle0,handle1} = prgm[i];
+        let {start,end,handle0,handle1, scale} = prgm[i];
         
         stack.push(function(t){
           const val = bezierEasing(start,handle0,handle1,end)(t);
-          return val;
+          return val*scale;
         });
       }
     }else if (opera == 'tor'){
