@@ -137,13 +137,6 @@ const STATE = {
       type: "rotate",
       opera: "tor"
     },
-    // { 
-    //   type: "point",
-    //   value: [0, 0],
-    //   // icon: "Pt",
-    //   text: "Pt",
-    //   opera: "nd"
-    // },
     { 
       type: "union",
       opera: "tor"
@@ -196,7 +189,7 @@ const STATE = {
   dragId: null,
   mouse: {x: 0, y: 0},
   result: null,
-  height: 10,
+  height: 5,
   layers: 50,
   threeLines: [],
   editor: null,
