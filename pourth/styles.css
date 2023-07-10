@@ -88,14 +88,16 @@ html, body {
 
 .editor-modal {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   flex-direction: column;
   position: absolute;
   background: lightblue;
   width: 400px;
   height: 400px;
-  translate: -50%;
-  left: 50%;
-  top: 10px;
+/*  translate: -50%;*/
+  right: 0px;
+  bottom: 0px;
   border-radius: 5px;
   border: 1px solid grey;
   padding: 10px;
