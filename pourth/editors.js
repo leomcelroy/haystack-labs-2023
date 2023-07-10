@@ -160,6 +160,9 @@ export const editors = {
     <div>number value: ${value.value}</div>
     <input @input=${e => value.value = Number(e.target.value)} .value=${value.value}/>
   `,
+  "code": (value) => html`
+    <textarea @input=${e => value.value = e.target.value} .value=${value.value} cols="48" rows="24"></textarea>
+  `,
 }
 
 
