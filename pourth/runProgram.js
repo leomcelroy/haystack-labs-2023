@@ -16,62 +16,67 @@ function expandMacros(programs, name){
 
 let funcMap = {
   'union':(f,g)=>(t)=>{
-    let a = f(t);
-    let b = g(t);
+    let a = f(t)
+    let b = g(t)
     return boolean('union',a,b);
   },
   'difference':(f,g)=>(t)=>{
-    let a = f(t);
-    let b = g(t);
+    let a = f(t)
+    let b = g(t)
     return boolean('difference',a,b);
   },
   'intersection':(f,g)=>(t)=>{
-    let a = f(t);
-    let b = g(t);
+    let a = f(t)
+    let b = g(t)
     return boolean('intersection',a,b);
   },
   'translateX':(f,g)=>(t)=>{
     let a = f(t);
     let b = g(t);
-    for (let i = 0; i < a.length; a++){
-      for (let j = 0; j < a[i].length; j++){
-        a[i][j][1] += b;
-      }
-    }
-  },
-  'translateY':(f,g)=>(t)=>{
-    let a = f(t);
-    let b = g(t);
-    for (let i = 0; i < a.length; a++){
+    
+    for (let i = 0; i < a.length; i++){
       for (let j = 0; j < a[i].length; j++){
         a[i][j][0] += b;
       }
     }
+    return a;
+  },
+  'translateY':(f,g)=>(t)=>{
+    let a = f(t);
+    let b = g(t);
+    for (let i = 0; i < a.length; i++){
+      for (let j = 0; j < a[i].length; j++){
+        a[i][j][1] += b;
+      }
+    }
+    return a;
   },
   'scaleX':(f,g)=>(t)=>{
     let a = f(t);
     let b = g(t);
-    for (let i = 0; i < a.length; a++){
+    for (let i = 0; i < a.length; i++){
       for (let j = 0; j < a[i].length; j++){
         a[i][j][0] *= b;
       }
     }
+    return a;
   },
   'scaleY':(f,g)=>(t)=>{
     let a = f(t);
     let b = g(t);
-    for (let i = 0; i < a.length; a++){
+    for (let i = 0; i < a.length; i++){
       for (let j = 0; j < a[i].length; j++){
         a[i][j][1] *= b;
       }
     }
+    return a;
   },
   'rotation':(f,g)=>(t)=>{
     let a = f(t);
     let b = g(t);
     let costh = Math.cos(b);
     let sinth = Math.sin(b);
-    for (let i = 0; i < a.length; a++){
+    for (let i = 0; i < a.length; i++){
       for (let j = 0; j < a[i].length; j++){
         let [x0,y0] = a[i][j];
         let x = x0* costh-y0*sinth;
@@ -80,6 +85,7 @@ let funcMap = {
         a[i][j][1] = y;
       }
     }
+    return a;
   },
   'multiply':(f,g)=>(t)=>{
     return f(t)*g(t);
@@ -90,6 +96,8 @@ let funcMap = {
   'warp':(f,g,h,q)=>(t)=>{
     let a = f(t);
     let b = g(t);
+    console.log('-----------');
+    console.log(a,b);
     for (let i = 0; i < a.length; i++){
       let n = a[i].length;
       for (let j = 0; j < n; j++){
@@ -103,18 +111,21 @@ let funcMap = {
         let l = Math.hypot(ex,ey);
         ex/=l;
         ey/=l;
+        console.log(ex,ey);
         let m = b;
         if (q == '+'){
-          m += h(i/a.length);
-        }else if (q == '*'){
-          m *= h(i/a.length);
+          m += h(j/n);
+        }else{
+          m *= h(j/n);
         }
         ex *= m;
         ey *= m;
+        
         a[i][j][0] = x1+ex;
         a[i][j][1] = y1+ey;
       }
     }
+    return a;
   }
 }
 
@@ -139,24 +150,62 @@ export function runProgram({ programs }) {
           let y = Math.sin(a);
           o.push([x,y]);
         }
-        stack.push([[o]]);
+        stack.push(t=>[JSON.parse(JSON.stringify(o))]);
+      }else if (type == 'number'){
+        let n = Number(prgm[i].value);
+        stack.push(t=>n);
       }else if (type == 'sine'){
         stack.push(function(t){
           let {frequency,phase,amplitude,shift} = prgm[i];
+          console.log({frequency,phase,amplitude,shift},t)
+          console.log(Math.sin((t+phase) / frequency * Math.PI * 2)*amplitude + shift)
           return Math.sin((t+phase) / frequency * Math.PI * 2)*amplitude + shift;
         });
       }else if (type == 'bezier'){
         stack.push(function(t){
           let {start,end,handle0,handle1} = prgm[i];
-          return bezierEasing(start,handle0,handle1,end);
+          return bezierEasing(start,handle0,handle1,end)(t);
         });
       }
     }else if (opera == 'tor'){
-      let a = stack.pop();
-      let b = stack.pop();
-      stack.push(funcMap[type](a,b))
+      if (type == 'warp'){
+        let a = stack.pop();
+        let b = stack.pop();
+        let c = stack.pop();
+        stack.push(funcMap[type](c,b,a))
+      }else{
+        let a = stack.pop();
+        let b = stack.pop();
+        stack.push(funcMap[type](b,a))
+      }
     }
   }
-  console.log(stack);
-  return stack.pop();
+  let fun = stack.pop();
+
+  let svg = visSvg(fun);
+  let div = document.createElement('div');
+  div.style="background:white;width:512px;height:512px;position:absolute;left:0px;top:0px;z-index:1000"
+  div.innerHTML = svg;
+  document.body.appendChild(div)
+
+  return fun;
+}
+
+
+function visSvg(fun){
+  let o = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">`;
+  
+  for (let i = 0; i < 50; i++){
+    let ps = fun(i);
+    console.log(JSON.stringify(ps));
+    for (let j = 0; j < ps.length; j++){
+      o += `<path d="M`;
+      for (let k = 0; k < ps[j].length; k++){
+        let [x,y] = ps[j][k];
+        o += `${x*100+256},${y*100+i*10} `
+      }
+      o += `z" stroke="black" fill="none"/>`
+    }
+  }
+  return o;
 }
