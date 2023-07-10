@@ -42,7 +42,7 @@ function getYForX(x, p0, p1, p2, p3) {
 
 export function bezierEasing(initial, p0, p1, final) {
     return x => getYForX(
-        x, 
+        Math.min(Math.max(0, x), 1), 
         [ 0, initial ], 
         [ Math.min(Math.max(0, p0[0]), 1), p0[1] ], 
         [ Math.min(Math.max(0, p1[0]), 1), p1[1] ],  

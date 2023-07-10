@@ -71,7 +71,7 @@ let funcMap = {
     }
     return a;
   },
-  'rotation':(f,g)=>(t)=>{
+  'rotate':(f,g)=>(t)=>{
     let a = f(t);
     let b = g(t);
     let costh = Math.cos(b);
@@ -128,20 +128,17 @@ let funcMap = {
 
 
 export function runProgram({ programs }) {
-  console.log(programs)
 
   let prgm = expandMacros(programs,"main");
-  console.log(prgm);
 
   let stack = [];
 
   for (let i = 0; i < prgm.length; i++){
     let {opera,type} = prgm[i];
-    console.log(prgm[i])
     if (opera == 'nd'){
       if (type == 'shape'){
         let o = [];
-        for (let j = 0; j < prgm[i].sides; j++){
+        for (let j = 0; j <= prgm[i].sides; j++){
           let a = j/prgm[i].sides * Math.PI*2;
           let x = Math.cos(a);
           let y = Math.sin(a);
@@ -156,17 +153,15 @@ export function runProgram({ programs }) {
           let {frequency,phase,amplitude,shift} = prgm[i];
           // console.log({frequency,phase,amplitude,shift},t)
           // console.log(Math.sin((t+phase) / frequency * Math.PI * 2)*amplitude + shift)
-          return Math.sin((t+phase) / frequency * Math.PI * 2)*amplitude + shift;
+          return Math.sin((t+phase) * frequency * Math.PI * 2)*amplitude + shift;
         });
       }else if (type == 'bezier'){
         let {start,end,handle0,handle1} = prgm[i];
         
         stack.push(function(t){
-<<<<<<< HEAD
-=======
-          let { start,end,handle0,handle1 } = prgm[i];
->>>>>>> a8d6e1329c49c3938e8eedcd8d5307aae6aff577
-          return bezierEasing(start,handle0,handle1,end)(t);
+          const val = bezierEasing(start,handle0,handle1,end)(t);
+          console.log(t, start, handle0, handle1, end, val);
+          return val;
         });
       }
     }else if (opera == 'tor'){
@@ -184,11 +179,11 @@ export function runProgram({ programs }) {
   }
   let fun = stack.pop();
 
-  let svg = visSvg(fun);
-  let div = document.createElement('div');
-  div.style="background:white;width:512px;height:512px;position:absolute;left:0px;top:0px;z-index:1000"
-  div.innerHTML = svg;
-  document.body.appendChild(div)
+  // let svg = visSvg(fun);
+  // let div = document.createElement('div');
+  // div.style="background:white;width:512px;height:512px;position:absolute;left:0px;top:0px;z-index:1000"
+  // div.innerHTML = svg;
+  // document.body.appendChild(div)
 
   return fun;
 }

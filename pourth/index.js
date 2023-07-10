@@ -7,6 +7,9 @@ import { addProgramEditting } from "./addProgramEditting.js"
 import { addBezHandle } from "./addBezHandle.js"
 import { addPtHandle } from "./addPtHandle.js"
 
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
 import { elsAtLoc } from "./elsAtLoc.js"
 
 const STATE = {
@@ -142,6 +145,7 @@ const STATE = {
   result: null,
   height: 10,
   layers: 50,
+  shape: 0,
   editor: null,
   editValue: null
 }
@@ -162,8 +166,8 @@ const EDITORS = {
     <input 
       type="range" 
       min="0" 
-      max="50"
-      step="0.0001" 
+      max="10"
+      step="0.00001" 
       .value=${value.frequency} 
       @input=${e => value.frequency = Number(e.target.value)}>
 
@@ -198,6 +202,8 @@ const EDITORS = {
       .sin-viz {
         background: white;
         transform: scale(1, -1);
+        border: 1px solid black;
+        border-radius: 3px;
       }
     </style>
     <svg class="sin-viz" width="250" height="250" viewBox="-1.05 -1.05 2.1 2.1" xmlns="http://www.w3.org/2000/svg">
@@ -218,6 +224,8 @@ const EDITORS = {
     .bez-ctrl {
       background: white;
       transform: scale(1, -1);
+      border: 1px solid black;
+      border-radius: 3px;
     }
   </style>
   <svg class="bez-ctrl" width="250" height="250" viewBox="0.05 -1.05 1.1 2.1" xmlns="http://www.w3.org/2000/svg">
@@ -239,16 +247,18 @@ const EDITORS = {
     <circle class="bez-handle" .value=${{ idx: "end", value }} cx="1" cy=${value.end} r=".05" fill="red"/>
 
 </svg>
-      start: ${value.start.toFixed(1)},
+      start: ${value.start.toFixed(2)},
       handle0: [${value.handle0[0].toFixed(1)}, ${value.handle0[1].toFixed(1)}],
       handle1: [${value.handle1[0].toFixed(1)}, ${value.handle1[1].toFixed(1)}],
-      end: 1
+      end: ${value.end.toFixed(2)}
   `,
   "point": (value) => svg`
     <style>
       .pt-ctrl {
         background: white;
         transform: scale(1, -1);
+        border: 1px solid black;
+        border-radius: 3px;
       }
     </style>
     <svg class="pt-ctrl" width="250" height="250" viewBox="-1.05 -1.05 2.1 2.1" xmlns="http://www.w3.org/2000/svg">
@@ -303,9 +313,9 @@ const drawGrid = ({ xMin, xMax, xStep, yMin, yMax, yStep }) => {
 function drawSine({ frequency, amplitude, phase, shift}) {
   const pts = [];
 
-  for (let i = -1; i <= 1; i += 0.01) {
+  for (let i = -1; i <= 1; i += 0.001) {
     let x = i;
-    let y = Math.sin(frequency*x+phase)*amplitude+shift;
+    let y = Math.sin((x+phase) * frequency * Math.PI * 2)*amplitude + shift;
     pts.push([x, y]);
   }
 
@@ -327,8 +337,8 @@ let macroCount = 0;
 function view(state) {
   return html`
     <div class="root">
-      <div class="view-window" style="display: relative;">
-        <div class="render-target"></div>
+      <div class="view-window" style="position: relative;">
+        <div class="render-target" style="height: 100%;"></div>
         <div class="height-layers">
           <div style="padding: 5px; display: flex; justify-content: space-between;">
             <span style="padding-right: 5px;">height</span><input style="width: 70px;" .value=${state.height} @input=${e => { state.height = Number(e.target.value)}}/>
@@ -347,7 +357,30 @@ function view(state) {
       <div style="display: flex; justify-content: space-evenly; padding: 5px">
         <button style="width: 150px; height: 30px;">save</button>
         <button style="width: 150px; height: 30px;">upload</button>
-        <button style="width: 150px; height: 30px;" @click=${() => runProgram(state)}>run</button>
+        <button style="width: 150px; height: 30px;" @click=${() => { 
+          const fn = runProgram(state);
+
+          const { height, layers } = state;
+          const shape = [];
+
+          for (let i = 0; i < layers; i += 1) { 
+            const t = i/(layers-1);
+            const z = t*height;
+            const pls = fn(t).map(pl => pl.map(pt => [...pt, z]));
+            shape.push(pls);
+          }
+
+          console.log(shape);
+
+          state.shape = shape;
+
+          if (state.animId) cancelAnimationFrame(state.animId);
+
+          document.querySelector(".render-target").innerHTML = "";
+
+          renderLines(shape.flat(), document.querySelector(".render-target"));
+
+        }}>run</button>
         <button style="width: 150px; height: 30px;" @click=${() => downloadGCode(state)}>download gcode</button>
         <button style="width: 150px; height: 30px;" @click=${() => {
           state.programs[`macro_${macroCount}`] = [];
@@ -476,4 +509,61 @@ addBezHandle(STATE);
 addPtHandle(STATE);
 
 window.STATE = STATE;
+
+
+function renderLines(lines, domElement, lineThickness = 0.1) {
+  // Get the dimensions of the DOM element
+  const width = domElement.clientWidth;
+  const height = domElement.clientHeight;
+
+  // Create a scene
+  const scene = new THREE.Scene();
+
+  // Add a base plane (GridHelper)
+  const size = 10;
+  const divisions = 10;
+  const gridHelper = new THREE.GridHelper(size, divisions);
+  scene.add(gridHelper);
+
+  // Create a camera with the aspect ratio of the DOM element
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.z = 5;
+
+  // Create a renderer and set its size to the dimensions of the DOM element
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(width, height);
+  domElement.appendChild(renderer.domElement);
+
+  // Create a material
+  const material = new THREE.LineBasicMaterial({
+    color: 0x00ff00,
+    linewidth: lineThickness,
+  });
+
+  lines.forEach(polyline => {
+    const geometry = new THREE.BufferGeometry().setFromPoints(polyline.map(pt => new THREE.Vector3(pt[0], pt[2], pt[1])));
+    const line = new THREE.Line(geometry, material);
+    scene.add(line);
+  });
+
+  // Add OrbitControls for panning and zooming
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; // required if controls.enableDamping or controls.autoRotate are set to true
+  controls.dampingFactor = 0.05;
+  controls.screenSpacePanning = false;
+  controls.minDistance = 1;
+  controls.maxDistance = 50;
+  controls.maxPolarAngle = Math.PI / 2;
+
+  // Animation
+  function animate() {
+    const id = requestAnimationFrame(animate);
+    controls.update(); // required if controls.enableDamping or controls.autoRotate are set to true
+    renderer.render(scene, camera);
+
+    return id;
+  }
+
+ STATE.animId = animate();
+}
 

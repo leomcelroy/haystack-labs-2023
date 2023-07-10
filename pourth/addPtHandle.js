@@ -1,4 +1,5 @@
 import { createListener } from "./createListener.js"
+import { elsAtLoc } from "./elsAtLoc.js";
 
 export function addPtHandle(state) {
   const listener = createListener(document.body);
@@ -8,7 +9,9 @@ export function addPtHandle(state) {
   let svg = null;
 
   listener("mousedown", ".pt-handle", e => {
-    draggedElement = e.target;
+    const els = elsAtLoc(e.clientX, e.clientY, ".pt-handle");
+    if (els.length === 0) return;
+    draggedElement = els[0];
     draggedElement.setAttribute('pointer-events', 'none');
     svg = draggedElement.ownerSVGElement;
   })

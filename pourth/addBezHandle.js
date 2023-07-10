@@ -1,5 +1,5 @@
 import { createListener } from "./createListener.js"
-
+import { elsAtLoc } from "./elsAtLoc.js";
 
 export function addBezHandle(state) {
   const listener = createListener(document.body);
@@ -9,10 +9,11 @@ export function addBezHandle(state) {
   let svg = null;
 
   listener("mousedown", ".bez-handle", (e) => {
-    if (!e.target.matches(".bez-handle")) return;
+    const els = elsAtLoc(e.clientX, e.clientY, ".bez-handle");
 
-    console.log(e);
-    draggedElement = e.target;
+    if (els.length === 0) return;
+
+    draggedElement = els[0];
 
     draggedElement.setAttribute('pointer-events', 'none');
     svg = draggedElement.ownerSVGElement;

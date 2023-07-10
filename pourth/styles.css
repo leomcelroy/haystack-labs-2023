@@ -47,6 +47,7 @@ html, body {
 .height-layers {
   position: absolute;
   right: 0px;
+  top: 0px;
   background: #ebebeb;
   padding: 10px;
   /* opacity: .7; */
@@ -92,7 +93,7 @@ html, body {
   align-items: center;
   flex-direction: column;
   position: absolute;
-  background: lightblue;
+  background: gainsboro;
   width: 400px;
   height: 400px;
 /*  translate: -50%;*/
