@@ -4,6 +4,8 @@ import { createListener } from "./createListener.js"
 import { runProgram } from "./runProgram.js"
 import { downloadGCode } from "./downloadGCode.js"
 import { addProgramEditting } from "./addProgramEditting.js"
+import { addBezHandle } from "./addBezHandle.js"
+
 import { elsAtLoc } from "./elsAtLoc.js"
 
 const STATE = {
@@ -13,12 +15,14 @@ const STATE = {
       type: "shape",
       sides: 32,
       icon: "shape",
+      opera: "nd"
     },
     { 
       color: "blue", 
       type: "number",
       value: 1,
       icon: "N",
+      opera: "nd"
     },
     { 
       color: "blue", 
@@ -35,88 +39,101 @@ const STATE = {
       phase: 0,
       shift: 0,
       icon: "sine",
+      opera: "nd"
     },
     { 
       color: "blue", 
       type: "difference",
-      icon: "D"
+      icon: "D",
+      opera: "tor"
       
     },
     { 
       color: "blue", 
       type: "union",
-      icon: "U"
+      icon: "U",
+      opera: "tor"
+    },
+    { 
+      color: "blue", 
+      type: "intersection",
+      icon: "I",
+      opera: "tor",
     },
     { 
       color: "blue", 
       type: "warp",
-      icon: "W"
+      icon: "W",
+      opera: "tor"
     },
     { 
       color: "blue", 
       type: "point",
-      icon: "Pt"
+      icon: "Pt",
+      opera: "nd"
     },
     { 
       color: "pink", 
       type: "bezier",
       start: 0,
-      handle0: [.5, .5],
-      handle1: [.5, .5],
+      handle0: [.5, 0],
+      handle1: [.5, 1],
       end: 1,
       icon: "bezier",
+      opera: "nd"
     },
     { 
       color: "yellow", 
       type: "translateX",
-      icon: "TX"
+      icon: "TX",
+      opera: "tor"
        
     }, 
     { 
       color: "green", 
       type: "translateY",
-      icon: "TY"
+      icon: "TY",
+      opera: "tor"
     }, 
     { 
       color: "orange", 
       type: "scaleX",
-      icon: "SX"
+      icon: "SX",
+      opera: "tor",
     },
     { 
       color: "purple",
       type: "scaleY",
-      icon: "SY"
+      icon: "SY",
+      opera: "tor"
     },
     { 
       color: "grey",
       type: "rotate",
-      icon: "R"
+      icon: "R",
+      opera: "tor"
     },
     { 
       color: "red", 
-      type: "compose",
-      icon: "C"
+      type: "code",
+      icon: "C",
+      opera: "tor"
     },
     { 
       color: "red", 
       type: "multiply",
-      icon: "x"
+      icon: "x",
+      opera: "tor"
     },
     { 
       color: "red", 
       type: "plus",
-      icon: "plus"
+      icon: "plus",
+      opera: "tor"
     },
   ],
   programs: {
-    "main": [ 
-      { 
-        color: "blue", 
-        type: "shape",
-        sides: 32,
-        icon: "shape"
-      },
-    ]
+    "main": [ ]
   },
   dragId: null,
   mouse: {x: 0, y: 0},
@@ -143,7 +160,8 @@ const EDITORS = {
     <input 
       type="range" 
       min="0" 
-      max="100" 
+      max="100"
+      step="0.0001" 
       .value=${value.frequency} 
       @input=${e => value.frequency = Number(e.target.value)}>
 
@@ -151,7 +169,8 @@ const EDITORS = {
     <input 
       type="range" 
       min="0" 
-      max="100" 
+      max="100"
+      step="0.0001"  
       .value=${value.amplitude} 
       @input=${e => value.amplitude = Number(e.target.value)}>
 
@@ -159,7 +178,8 @@ const EDITORS = {
     <input 
       type="range" 
       min="0" 
-      max="100" 
+      max="100"
+      step="0.0001"  
       .value=${value.phase} 
       @input=${e => value.phase = Number(e.target.value)}>
 
@@ -167,13 +187,78 @@ const EDITORS = {
     <input 
       type="range" 
       min="0" 
-      max="100" 
+      max="100"
+      step="0.0001"  
       .value=${value.shift} 
       @input=${e => value.shift = Number(e.target.value)}>
   `,
-  "bezier": (value) => html`
+  "bezier": (value) => svg`
+  <style>
+    .bez-ctrl {
+      background: white;
+      transform: scale(1, -1);
+    }
+  </style>
+  <svg class="bez-ctrl" width="250" height="250" viewBox="0.05 -1.05 1.1 2.1" xmlns="http://www.w3.org/2000/svg">
+  <!-- Draw vertical grid lines -->
+  <g stroke="lightgray" stroke-width="0.005">
+    <line x1="0" y1="-1" x2="0" y2="1" />
+    <line x1="0.1" y1="-1" x2="0.1" y2="1" />
+    <line x1="0.2" y1="-1" x2="0.2" y2="1" />
+    <line x1="0.3" y1="-1" x2="0.3" y2="1" />
+    <line x1="0.4" y1="-1" x2="0.4" y2="1" />
+    <line x1="0.5" y1="-1" x2="0.5" y2="1" />
+    <line x1="0.6" y1="-1" x2="0.6" y2="1" />
+    <line x1="0.7" y1="-1" x2="0.7" y2="1" />
+    <line x1="0.8" y1="-1" x2="0.8" y2="1" />
+    <line x1="0.9" y1="-1" x2="0.9" y2="1" />
+    <line x1="1" y1="-1" x2="1" y2="1" />
+  </g>
+
+  <!-- Draw horizontal grid lines -->
+  <g stroke="lightgray" stroke-width="0.005">
+    <line x1="0" y1="-1" x2="1" y2="-1" />
+    <line x1="0" y1="-0.9" x2="1" y2="-0.9" />
+    <line x1="0" y1="-0.8" x2="1" y2="-0.8" />
+    <line x1="0" y1="-0.7" x2="1" y2="-0.7" />
+    <line x1="0" y1="-0.6" x2="1" y2="-0.6" />
+    <line x1="0" y1="-0.5" x2="1" y2="-0.5" />
+    <line x1="0" y1="-0.4" x2="1" y2="-0.4" />
+    <line x1="0" y1="-0.3" x2="1" y2="-0.3" />
+    <line x1="0" y1="-0.2" x2="1" y2="-0.2" />
+    <line x1="0" y1="-0.1" x2="1" y2="-0.1" />
+    <line x1="0" y1="0" x2="1" y2="0" />
+    <line x1="0" y1="0.1" x2="1" y2="0.1" />
+    <line x1="0" y1="0.2" x2="1" y2="0.2" />
+    <line x1="0" y1="0.3" x2="1" y2="0.3" />
+    <line x1="0" y1="0.4" x2="1" y2="0.4" />
+    <line x1="0" y1="0.5" x2="1" y2="0.5" />
+    <line x1="0" y1="0.6" x2="1" y2="0.6" />
+    <line x1="0" y1="0.7" x2="1" y2="0.7" />
+    <line x1="0" y1="0.8" x2="1" y2="0.8" />
+    <line x1="0" y1="0.9" x2="1" y2="0.9" />
+    <line x1="0" y1="1" x2="1" y2="1" />
+  </g>
+
+   <path d="M0,${value.start} C ${value.handle0[0]},${value.handle0[1]} ${value.handle1[0]},${value.handle1[1]} 1,${value.end}" stroke-width=".05px" stroke="black" fill="none"/>
+    <line x1="0" y1=${value.start} x2=${value.handle0[0]} y2=${value.handle0[1]} stroke="black" stroke-width="0.01" stroke-dasharray="0.02,0.02" />
+    <line x1=${value.handle1[0]} y1=${value.handle1[1]} x2="1" y2=${value.end} stroke="black" stroke-width="0.01" stroke-dasharray="0.02,0.02" />
+    
+    <circle class="bez-handle" cx="0" cy=${value.start} r=".05" fill="red"/>
+    <circle class="bez-handle" cx=${value.handle0[0]} cy=${value.handle0[1]} r=".05" fill="red"/>
+    <circle class="bez-handle" cx=${value.handle1[0]} cy=${value.handle1[1]} r=".05" fill="red"/>
+    <circle class="bez-handle" cx="1" cy=${value.end} r=".05" fill="red"/>
+
+
+</svg>
+      start: ${value.start},
+      handle0: [${value.handle0[0]}, ${value.handle0[1]}],
+      handle1: [${value.handle1[0]}, ${value.handle1[1]}],
+      end: 1
   `,
-  "pt": (value) => html`
+  "pt": (value) => svg`
+    <svg width="250" height="250">
+    </svg>
   `,
   "macro": (value) => html`
     <div>macro name: ${value.value}</div>
@@ -334,8 +419,7 @@ window.addEventListener("mousemove", e => {
 })
 
 addProgramEditting(STATE);
-
-
+addBezHandle(STATE);
 
 window.STATE = STATE;
 
