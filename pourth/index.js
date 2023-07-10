@@ -111,6 +111,32 @@ const STATE = {
       scale: 1,
       opera: "nd"
     },
+    { 
+      type: "translateX",
+      opera: "tor"
+       
+    }, 
+    { 
+      type: "translateY",
+      opera: "tor"
+    }, 
+    { 
+      type: "scale",
+      direction: "xy", // "x" "y"
+      opera: "tor",
+    },
+    { 
+      type: "scaleX",
+      opera: "tor",
+    },
+    { 
+      type: "scaleY",
+      opera: "tor",
+    },
+    { 
+      type: "rotate",
+      opera: "tor"
+    },
     // { 
     //   type: "point",
     //   value: [0, 0],
@@ -146,41 +172,6 @@ const STATE = {
     //   text: "Pt",
     //   opera: "nd"
     // },
-    { 
-      type: "translateX",
-      opera: "tor"
-       
-    }, 
-    { 
-      type: "translateY",
-      opera: "tor"
-    }, 
-    { 
-      type: "difference",
-      opera: "tor"
-      
-    },
-    { 
-      type: "union",
-      opera: "tor"
-    },
-    { 
-      type: "scale",
-      direction: "xy", // "x" "y"
-      opera: "tor",
-    },
-    { 
-      type: "scaleX",
-      opera: "tor",
-    },
-    { 
-      type: "scaleY",
-      opera: "tor",
-    },
-    { 
-      type: "rotate",
-      opera: "tor"
-    },
     { 
       type: "multiply",
       opera: "tor"
