@@ -18,17 +18,17 @@ let funcMap = {
   'union':(f,g)=>(t)=>{
     let a = f(t)
     let b = g(t)
-    return boolean('union',a,b);
+    return boolean(a,b,'union');
   },
   'difference':(f,g)=>(t)=>{
     let a = f(t)
     let b = g(t)
-    return boolean('difference',a,b);
+    return boolean(a,b,'difference');
   },
   'intersection':(f,g)=>(t)=>{
     let a = f(t)
     let b = g(t)
-    return boolean('intersection',a,b);
+    return boolean(a,b,'intersection');
   },
   'translateX':(f,g)=>(t)=>{
     let a = f(t);
@@ -96,8 +96,6 @@ let funcMap = {
   'warp':(f,g,h,q)=>(t)=>{
     let a = f(t);
     let b = g(t);
-    console.log('-----------');
-    console.log(a,b);
     for (let i = 0; i < a.length; i++){
       let n = a[i].length;
       for (let j = 0; j < n; j++){
@@ -111,7 +109,6 @@ let funcMap = {
         let l = Math.hypot(ex,ey);
         ex/=l;
         ey/=l;
-        console.log(ex,ey);
         let m = b;
         if (q == '+'){
           m += h(j/n);
@@ -157,8 +154,8 @@ export function runProgram({ programs }) {
       }else if (type == 'sine'){
         stack.push(function(t){
           let {frequency,phase,amplitude,shift} = prgm[i];
-          console.log({frequency,phase,amplitude,shift},t)
-          console.log(Math.sin((t+phase) / frequency * Math.PI * 2)*amplitude + shift)
+          // console.log({frequency,phase,amplitude,shift},t)
+          // console.log(Math.sin((t+phase) / frequency * Math.PI * 2)*amplitude + shift)
           return Math.sin((t+phase) / frequency * Math.PI * 2)*amplitude + shift;
         });
       }else if (type == 'bezier'){
