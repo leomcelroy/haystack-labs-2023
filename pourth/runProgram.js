@@ -163,7 +163,7 @@ export function runProgram({ programs }) {
         });
       }else if (type == 'bezier'){
         stack.push(function(t){
-          let {start,end,handle0,handle1} = prgm[i];
+          let { start,end,handle0,handle1 } = prgm[i];
           return bezierEasing(start,handle0,handle1,end)(t);
         });
       }
