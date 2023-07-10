@@ -156,17 +156,18 @@ const STATE = {
       opera: "tor"
     }, 
     { 
-      type: "difference",
-      opera: "tor"
-      
+      type: "scaleX",
+      direction: "x",
+      opera: "tor",
     },
     { 
-      type: "union",
-      opera: "tor"
+      type: "scaleY",
+      direction: "y",
+      opera: "tor",
     },
     { 
       type: "scale",
-      direction: "xy", // "x" "y"
+      direction: "xy",
       opera: "tor",
     },
     { 
