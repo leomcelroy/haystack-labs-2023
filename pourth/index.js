@@ -162,7 +162,7 @@ const EDITORS = {
     <input 
       type="range" 
       min="0" 
-      max="100"
+      max="50"
       step="0.0001" 
       .value=${value.frequency} 
       @input=${e => value.frequency = Number(e.target.value)}>
@@ -171,16 +171,16 @@ const EDITORS = {
     <input 
       type="range" 
       min="0" 
-      max="100"
-      step="0.0001"  
+      max="2"
+      step="0.001"  
       .value=${value.amplitude} 
       @input=${e => value.amplitude = Number(e.target.value)}>
 
     <div>Phase: ${value.phase.toFixed(3)}</div>
     <input 
       type="range" 
-      min="0" 
-      max="100"
+      min="-2" 
+      max="2"
       step="0.0001"  
       .value=${value.phase} 
       @input=${e => value.phase = Number(e.target.value)}>
@@ -188,8 +188,8 @@ const EDITORS = {
     <div>Shift: ${value.shift.toFixed(3)}</div>
     <input 
       type="range" 
-      min="0" 
-      max="100"
+      min="-2" 
+      max="2"
       step="0.0001"  
       .value=${value.shift} 
       @input=${e => value.shift = Number(e.target.value)}>
