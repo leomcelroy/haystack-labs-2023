@@ -34,7 +34,7 @@ export function addProgramEditting(state) {
 
     const data = {
       data: {type: 'macro', value: e.target.data },
-      index: 14,
+      index: 0,
       name: "",
       shiftX: 18,
       shiftY: 19.6015625
