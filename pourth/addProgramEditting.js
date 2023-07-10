@@ -8,7 +8,8 @@ export function addProgramEditting(state) {
   let fromToolbox = false;
   let dragged = false;
 
-  listener("mousedown", ".box", (e, trigger) => {
+  listener("mousedown", ".box", (e) => {
+    const trigger = e.target;
     const index = Number(trigger.dataset.index);
     const data = state.boxes[index];
     const shiftX = e.clientX - trigger.getBoundingClientRect().left;
@@ -25,7 +26,8 @@ export function addProgramEditting(state) {
     fromToolbox = true;
   })
 
-  listener("mousedown", ".draggable-box", (e, trigger) => {
+  listener("mousedown", ".draggable-box", (e) => {
+    const trigger = e.target;
     const index = Number(trigger.dataset.index);
     const name = trigger.dataset.programName;
     const data = state.programs[name][index];

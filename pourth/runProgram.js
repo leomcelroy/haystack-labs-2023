@@ -162,6 +162,10 @@ export function runProgram({ programs }) {
         let {start,end,handle0,handle1} = prgm[i];
         
         stack.push(function(t){
+<<<<<<< HEAD
+=======
+          let { start,end,handle0,handle1 } = prgm[i];
+>>>>>>> a8d6e1329c49c3938e8eedcd8d5307aae6aff577
           return bezierEasing(start,handle0,handle1,end)(t);
         });
       }

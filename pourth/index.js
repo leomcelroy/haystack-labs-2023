@@ -233,11 +233,10 @@ const EDITORS = {
     <line x1="0" y1=${value.start} x2=${value.handle0[0]} y2=${value.handle0[1]} stroke="black" stroke-width="0.01" stroke-dasharray="0.02,0.02" />
     <line x1=${value.handle1[0]} y1=${value.handle1[1]} x2="1" y2=${value.end} stroke="black" stroke-width="0.01" stroke-dasharray="0.02,0.02" />
     
-    <circle class="bez-handle" @mousedown=${e => STATE.selectedPoint = ({idx: "start", value })} cx="0" cy=${value.start} r=".05" fill="red"/>
-    <circle class="bez-handle" @mousedown=${e => STATE.selectedPoint = ({idx: "handle0", value })} cx=${value.handle0[0]} cy=${value.handle0[1]} r=".05" fill="red"/>
-    <circle class="bez-handle" @mousedown=${e => STATE.selectedPoint = ({idx: "handle1", value })} cx=${value.handle1[0]} cy=${value.handle1[1]} r=".05" fill="red"/>
-    <circle class="bez-handle" @mousedown=${e => STATE.selectedPoint = ({idx: "end", value })} cx="1" cy=${value.end} r=".05" fill="red"/>
-
+    <circle class="bez-handle" .value=${{ idx: "start", value }} cx="0" cy=${value.start} r=".05" fill="red"/>
+    <circle class="bez-handle" .value=${{ idx: "handle0", value }} cx=${value.handle0[0]} cy=${value.handle0[1]} r=".05" fill="red"/>
+    <circle class="bez-handle" .value=${{ idx: "handle1", value }} cx=${value.handle1[0]} cy=${value.handle1[1]} r=".05" fill="red"/>
+    <circle class="bez-handle" .value=${{ idx: "end", value }} cx="1" cy=${value.end} r=".05" fill="red"/>
 
 </svg>
       start: ${value.start.toFixed(1)},
@@ -261,7 +260,7 @@ const EDITORS = {
         yMax: 1,
         yStep: 0.1,
       })}
-      <circle class="pt-handle" cx=${value.value[0]} cy=${value.value[1]} r=".05" fill="red" @mousedown=${e => STATE.selectedPoint = ({idx: "", value })}/>
+      <circle class="pt-handle" cx=${value.value[0]} cy=${value.value[1]} r=".05" fill="red" .value=${{ value }}/>
     </svg>
     pt: ${value.value[0].toFixed(1)}, ${value.value[1].toFixed(1)}
   `,

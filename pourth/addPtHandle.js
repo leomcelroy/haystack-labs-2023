@@ -31,7 +31,7 @@ export function addPtHandle(state) {
       y = Math.max(y, -1);
       y = Math.min(y, 1);
 
-      const { value } = state.selectedPoint;
+      const { value } = draggedElement.value;
 
       value.value[0] = x;
       value.value[1] = y;
@@ -45,7 +45,7 @@ export function addPtHandle(state) {
       draggedElement.setAttribute('pointer-events', 'all');
       draggedElement = null;
       svg = null;
-      state.selectedPoint = null;
+      
     }
   })
 }

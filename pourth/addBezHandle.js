@@ -8,8 +8,12 @@ export function addBezHandle(state) {
   let draggedElement = null;
   let svg = null;
 
-  listener("mousedown", ".bez-handle", e => {
+  listener("mousedown", ".bez-handle", (e) => {
+    if (!e.target.matches(".bez-handle")) return;
+
+    console.log(e);
     draggedElement = e.target;
+
     draggedElement.setAttribute('pointer-events', 'none');
     svg = draggedElement.ownerSVGElement;
   })
@@ -31,7 +35,7 @@ export function addBezHandle(state) {
       y = Math.max(y, -1);
       y = Math.min(y, 1);
 
-      const { idx, value } = state.selectedPoint;
+      const { idx, value } = draggedElement.value;
 
       if (idx === "start" || idx === "end") {
         value[idx] = y;
@@ -48,7 +52,6 @@ export function addBezHandle(state) {
       draggedElement.setAttribute('pointer-events', 'all');
       draggedElement = null;
       svg = null;
-      state.selectedPoint = null;
     }
   })
 }
