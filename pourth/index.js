@@ -4,6 +4,7 @@ import { runProgram } from "./runProgram.js"
 import { downloadGCode } from "./downloadGCode.js"
 import { addProgramEditting } from "./addProgramEditting.js"
 import { addBezHandle } from "./addBezHandle.js"
+import { addPtHandle } from "./addPtHandle.js"
 
 import { elsAtLoc } from "./elsAtLoc.js"
 
@@ -68,6 +69,7 @@ const STATE = {
     { 
       color: "blue", 
       type: "point",
+      value: [0, 0],
       icon: "Pt",
       opera: "nd"
     },
@@ -199,65 +201,49 @@ const EDITORS = {
     }
   </style>
   <svg class="bez-ctrl" width="250" height="250" viewBox="0.05 -1.05 1.1 2.1" xmlns="http://www.w3.org/2000/svg">
-  <!-- Draw vertical grid lines -->
-  <g stroke="lightgray" stroke-width="0.005">
-    <line x1="0" y1="-1" x2="0" y2="1" />
-    <line x1="0.1" y1="-1" x2="0.1" y2="1" />
-    <line x1="0.2" y1="-1" x2="0.2" y2="1" />
-    <line x1="0.3" y1="-1" x2="0.3" y2="1" />
-    <line x1="0.4" y1="-1" x2="0.4" y2="1" />
-    <line x1="0.5" y1="-1" x2="0.5" y2="1" />
-    <line x1="0.6" y1="-1" x2="0.6" y2="1" />
-    <line x1="0.7" y1="-1" x2="0.7" y2="1" />
-    <line x1="0.8" y1="-1" x2="0.8" y2="1" />
-    <line x1="0.9" y1="-1" x2="0.9" y2="1" />
-    <line x1="1" y1="-1" x2="1" y2="1" />
-  </g>
-
-  <!-- Draw horizontal grid lines -->
-  <g stroke="lightgray" stroke-width="0.005">
-    <line x1="0" y1="-1" x2="1" y2="-1" />
-    <line x1="0" y1="-0.9" x2="1" y2="-0.9" />
-    <line x1="0" y1="-0.8" x2="1" y2="-0.8" />
-    <line x1="0" y1="-0.7" x2="1" y2="-0.7" />
-    <line x1="0" y1="-0.6" x2="1" y2="-0.6" />
-    <line x1="0" y1="-0.5" x2="1" y2="-0.5" />
-    <line x1="0" y1="-0.4" x2="1" y2="-0.4" />
-    <line x1="0" y1="-0.3" x2="1" y2="-0.3" />
-    <line x1="0" y1="-0.2" x2="1" y2="-0.2" />
-    <line x1="0" y1="-0.1" x2="1" y2="-0.1" />
-    <line x1="0" y1="0" x2="1" y2="0" />
-    <line x1="0" y1="0.1" x2="1" y2="0.1" />
-    <line x1="0" y1="0.2" x2="1" y2="0.2" />
-    <line x1="0" y1="0.3" x2="1" y2="0.3" />
-    <line x1="0" y1="0.4" x2="1" y2="0.4" />
-    <line x1="0" y1="0.5" x2="1" y2="0.5" />
-    <line x1="0" y1="0.6" x2="1" y2="0.6" />
-    <line x1="0" y1="0.7" x2="1" y2="0.7" />
-    <line x1="0" y1="0.8" x2="1" y2="0.8" />
-    <line x1="0" y1="0.9" x2="1" y2="0.9" />
-    <line x1="0" y1="1" x2="1" y2="1" />
-  </g>
-
+    ${drawGrid({
+      xMin: 0,
+      xMax: 1,
+      xStep: 0.1,
+      yMin: -1,
+      yMax: 1,
+      yStep: 0.1,
+    })}
    <path d="M0,${value.start} C ${value.handle0[0]},${value.handle0[1]} ${value.handle1[0]},${value.handle1[1]} 1,${value.end}" stroke-width=".05px" stroke="black" fill="none"/>
     <line x1="0" y1=${value.start} x2=${value.handle0[0]} y2=${value.handle0[1]} stroke="black" stroke-width="0.01" stroke-dasharray="0.02,0.02" />
     <line x1=${value.handle1[0]} y1=${value.handle1[1]} x2="1" y2=${value.end} stroke="black" stroke-width="0.01" stroke-dasharray="0.02,0.02" />
     
-    <circle class="bez-handle" cx="0" cy=${value.start} r=".05" fill="red"/>
-    <circle class="bez-handle" cx=${value.handle0[0]} cy=${value.handle0[1]} r=".05" fill="red"/>
-    <circle class="bez-handle" cx=${value.handle1[0]} cy=${value.handle1[1]} r=".05" fill="red"/>
-    <circle class="bez-handle" cx="1" cy=${value.end} r=".05" fill="red"/>
+    <circle class="bez-handle" @mousedown=${e => STATE.selectedPoint = ({idx: "start", value })} cx="0" cy=${value.start} r=".05" fill="red"/>
+    <circle class="bez-handle" @mousedown=${e => STATE.selectedPoint = ({idx: "handle0", value })} cx=${value.handle0[0]} cy=${value.handle0[1]} r=".05" fill="red"/>
+    <circle class="bez-handle" @mousedown=${e => STATE.selectedPoint = ({idx: "handle1", value })} cx=${value.handle1[0]} cy=${value.handle1[1]} r=".05" fill="red"/>
+    <circle class="bez-handle" @mousedown=${e => STATE.selectedPoint = ({idx: "end", value })} cx="1" cy=${value.end} r=".05" fill="red"/>
 
 
 </svg>
-      start: ${value.start},
-      handle0: [${value.handle0[0]}, ${value.handle0[1]}],
-      handle1: [${value.handle1[0]}, ${value.handle1[1]}],
+      start: ${value.start.toFixed(1)},
+      handle0: [${value.handle0[0].toFixed(1)}, ${value.handle0[1].toFixed(1)}],
+      handle1: [${value.handle1[0].toFixed(1)}, ${value.handle1[1].toFixed(1)}],
       end: 1
   `,
-  "pt": (value) => svg`
-    <svg width="250" height="250">
+  "point": (value) => svg`
+    <style>
+      .pt-ctrl {
+        background: white;
+        transform: scale(1, -1);
+      }
+    </style>
+    <svg class="pt-ctrl" width="250" height="250" viewBox="-1.05 -1.05 2.1 2.1" xmlns="http://www.w3.org/2000/svg">
+      ${drawGrid({
+        xMin: -1,
+        xMax: 1,
+        xStep: 0.1,
+        yMin: -1,
+        yMax: 1,
+        yStep: 0.1,
+      })}
+      <circle class="pt-handle" cx=${value.value[0]} cy=${value.value[1]} r=".05" fill="red" @mousedown=${e => STATE.selectedPoint = ({idx: "", value })}/>
     </svg>
+    pt: ${value.value[0].toFixed(1)}, ${value.value[1].toFixed(1)}
   `,
   "macro": (value) => html`
     <div>macro name: ${value.value}</div>
@@ -267,6 +253,32 @@ const EDITORS = {
     <div>number value: ${value.value}</div>
     <input @input=${e => value.value = e.target.value} .value=${value.value}/>
   `,
+}
+
+const drawGrid = ({ xMin, xMax, xStep, yMin, yMax, yStep }) => {
+  const xLines = [];
+  for (let i = xMin; i <= xMax; i += xStep) {
+    xLines.push(svg`<line x1=${i} y1=${yMin} x2=${i} y2=${yMax} />`)
+  }
+
+  const yLines = [];
+  for (let i = yMin; i <= yMax; i += yStep) {
+    yLines.push(svg`<line x1=${xMin} y1=${i} x2=${xMax} y2=${i} />`)
+  }
+
+
+  return svg`
+    <!-- Draw vertical grid lines -->
+    <g stroke="lightgray" stroke-width="0.005">
+      ${xLines}
+    </g>
+
+    <!-- Draw horizontal grid lines -->
+    <g stroke="lightgray" stroke-width="0.005">
+      ${yLines}
+    </g>
+
+  `
 }
 
 let macroCount = 0;
@@ -419,6 +431,7 @@ window.addEventListener("mousemove", e => {
 
 addProgramEditting(STATE);
 addBezHandle(STATE);
+addPtHandle(STATE);
 
 window.STATE = STATE;
 
