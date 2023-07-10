@@ -258,10 +258,10 @@ const box = (box, index) => html`
       background-position: center;
       border: 1px solid black;
       border-radius: 3px; 
-      display: "flex";
-      align-items: "center";
-      font-size: "xx-large";
-      justify-content: "center";
+      display: flex;
+      align-items: center;
+      font-size: xx-large;
+      justify-content: center;
     `}>
     ${!box.icon ? box.text : ""}
   </div>
@@ -340,10 +340,10 @@ const drawDragged = (box, mouse) => box === null ? "" : html`
       border-radius: 3px;
       left:${mouse.x-box.shiftX}px; 
       top:${mouse.y-box.shiftY}px;
-      display: "flex";
-      align-items: "center";
-      font-size: "xx-large";
-      justify-content: "center";
+      display: flex;
+      align-items: center;
+      font-size: xx-large;
+      justify-content: center;
       `}>
       
       ${!box.data.icon ? box.data.text : ""}
