@@ -87,12 +87,14 @@ const STATE = {
     { 
       type: "shape",
       sides: 32,
-      opera: "nd"
+      opera: "nd",
+      color: [400,-50]
     },
     { 
       type: "number",
       value: 1,
       opera: "nd",
+      color: [200,0]
     },
     { 
       type: "sine",
@@ -100,7 +102,8 @@ const STATE = {
       amplitude: 1,
       phase: 0,
       shift: 0,
-      opera: "nd"
+      opera: "nd",
+      color: [200,0]
     },
     { 
       type: "bezier",
@@ -109,7 +112,41 @@ const STATE = {
       handle1: [.5, 1],
       end: 1,
       scale: 1,
-      opera: "nd"
+      opera: "nd",
+      color: [200,0]
+    },
+    { 
+      type: "translateX",
+      opera: "tor",
+      color: [50,0]
+    }, 
+    { 
+      type: "translateY",
+      opera: "tor",
+      color: [50,0]
+    }, 
+    { 
+      type: "scaleX",
+      direction: "x",
+      opera: "tor",
+      color: [50,0]
+    },
+    { 
+      type: "scaleY",
+      direction: "y",
+      opera: "tor",
+      color: [50,0]
+    },
+    { 
+      type: "scale",
+      direction: "xy",
+      opera: "tor",
+      color: [50,0]
+    },
+    { 
+      type: "rotate",
+      opera: "tor",
+      color: [50,0]
     },
     // { 
     //   type: "point",
@@ -120,24 +157,29 @@ const STATE = {
     // },
     { 
       type: "union",
-      opera: "tor"
+      opera: "tor",
+      color: [200,100]
     },
     { 
       type: "difference",
-      opera: "tor"
+      opera: "tor",
+      color: [200,100]
       
     },
     { 
       type: "intersection",
       opera: "tor",
+      color: [200,100]
     },
     { 
       type: "warp",
-      opera: "tor"
+      opera: "tor",
+      color: [200,-60]
     },
     { 
       type: "smooth",
-      opera: "tor"
+      opera: "tor",
+      color: [200,-60]
     },
     // { 
     //   type: "point",
@@ -146,58 +188,27 @@ const STATE = {
     //   text: "Pt",
     //   opera: "nd"
     // },
-    { 
-      type: "translateX",
-      opera: "tor"
-       
-    }, 
-    { 
-      type: "translateY",
-      opera: "tor"
-    }, 
-    { 
-      type: "scaleX",
-      direction: "x",
-      opera: "tor",
-    },
-    { 
-      type: "scaleY",
-      direction: "y",
-      opera: "tor",
-    },
-    { 
-      type: "scale",
-      direction: "xy",
-      opera: "tor",
-    },
-    { 
-      type: "scaleX",
-      opera: "tor",
-    },
-    { 
-      type: "scaleY",
-      opera: "tor",
-    },
-    { 
-      type: "rotate",
-      opera: "tor"
-    },
+
     { 
       type: "multiply",
-      opera: "tor"
+      opera: "tor",
+      color: [200,30]
     },
     { 
       type: "plus",
-      opera: "tor"
+      opera: "tor",
+      color: [200,30]
     },    
-    { 
-      type: "macro",
-      value: "",
-    },
+    // { 
+    //   type: "macro",
+    //   value: "",
+    //   color: [500,-160]
+    // },
     { 
       type: "code",
       value: "t=>{\n  return t;\n}",
-      opera: "tor"
+      opera: "tor",
+      color: [0,0]
     },
   ],
   programs: {
@@ -272,6 +283,7 @@ const box = (box, index) => html`
       align-items: "center";
       font-size: "xx-large";
       justify-content: "center";
+      filter: sepia(100%) saturate(${box.color[0]}%) hue-rotate(${box.color[1]}deg);
     `}>
     ${!box.icon ? box.text : ""}
   </div>
@@ -295,6 +307,7 @@ const draggableBox = (box, index, name) => {
         align-items: center;
         font-size: xx-large;
         justify-content: center;
+        filter: sepia(100%) saturate(${box.color[0]}%) hue-rotate(${box.color[1]}deg);
       `}>
       ${!box.icon ? box.text : ""}
     </div>
@@ -354,6 +367,7 @@ const drawDragged = (box, mouse) => box === null ? "" : html`
       align-items: "center";
       font-size: "xx-large";
       justify-content: "center";
+      filter: sepia(100%) saturate(${box.data.color[0]}%) hue-rotate(${box.data.color[1]}deg);
       `}>
       
       ${!box.data.icon ? box.data.text : ""}
