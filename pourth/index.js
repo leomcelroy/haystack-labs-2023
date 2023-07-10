@@ -10,15 +10,83 @@ import { download } from "./download.js";
 import { addUpload } from "./addUpload.js";
 import * as THREE from 'three';
 import { OrbitControls } from 'orbitControls';
+import { bezierEasing } from "./bezierEasing.js";
 
 import { elsAtLoc } from "./elsAtLoc.js"
+
+
+function svg2url(s){
+  let ss = `
+  <svg width="40" height="40" viewBox="-10 -10 120 120" xmlns="http://www.w3.org/2000/svg">
+    <path d="M-20 -20 120 -20 120 120 -20 120" fill="white"/>
+    ${s};
+  </svg>
+  `
+  return "data:image/svg+xml,"+encodeURIComponent(ss);
+}
+
+function makeIcon(box){
+  if (box.opera == 'tor'){
+    return 'icons/'+box.type+".png";
+  }else{
+    if (box.type == 'sine'){
+      let {frequency,phase,amplitude,shift} = box;
+      let s = `<path d="M `;
+      for (let i = 0; i < 100; i++){
+        let t = i/100;
+        let y = Math.sin((t+phase) * frequency * Math.PI * 2)*amplitude + shift;
+        s += i+" ";
+        s += (50-y*50)+" "
+      }
+      s += `" fill="none" stroke="black" stroke-width="3"/>`
+      return svg2url(s);
+    }else if (box.type == 'bezier'){
+      let {start,end,handle0,handle1} = box;
+      let s = `<path d="M `;
+      for (let i = 0; i < 100; i++){
+        let t = i/100;
+        let y = bezierEasing(start,handle0,handle1,end)(t);
+        s += i+" ";
+        s += (50-y*50)+" "
+      };
+      s += `" fill="none" stroke="black" stroke-width="3"/>`
+      return svg2url(s);
+    }else if (box.type == 'shape'){
+      let {sides} = box;
+      let s = `<path d="M `;
+      for (let j = 0; j <= sides; j++){
+        let a = j/sides * Math.PI*2;
+        let x = Math.cos(a);
+        let y = Math.sin(a);
+        s += (50+x*45)+" ";
+        s += (50+y*45)+" ";
+      }
+      s += `" fill="none" stroke="black" stroke-width="3"/>`
+      return svg2url(s);
+    }else if (box.type == 'number'){
+      let {value} = box;
+      let s = `<path d="M ${0} ${50-value*50} 100 ${50-value*50}" fill="none" stroke="black" stroke-width="3"/>`
+      s += `<text x="50" y="50" font-family="monospace" font-size="40" text-anchor="middle" alignment-baseline="central">${~~(value*100)/100}</text>`
+      return svg2url(s);
+    }else if (box.type == 'macro'){
+      let {value} = box;
+      let s = ``;
+      s += `<path d="M0 40 100 40 100 90 0 90 z" fill="none" stroke="black" stroke-width="3"/>`;
+      s += `<text x="50" y="18" font-family="monospace" font-size="45" text-anchor="middle" alignment-baseline="central">#</text>`
+      s += `<text x="50" y="65" font-family="monospace" font-size="30" text-anchor="middle" alignment-baseline="central">${value}</text>`
+      
+      return svg2url(s);
+    }else{
+      return 'icons/warp.png';
+    }
+  }
+}
 
 const STATE = {
   boxes: [ 
     { 
       type: "shape",
       sides: 32,
-      icon: "shape",
       opera: "nd"
     },
     { 
@@ -27,7 +95,6 @@ const STATE = {
       amplitude: 1,
       phase: 0,
       shift: 0,
-      icon: "sine",
       opera: "nd"
     },
     { 
@@ -36,94 +103,79 @@ const STATE = {
       handle0: [.5, 0],
       handle1: [.5, 1],
       end: 1,
-      icon: "bezier",
       opera: "nd"
     },
     { 
       type: "scale",
       direction: "xy", // "x" "y"
       opera: "tor",
-      text: "S"
     },
     { 
       type: "number",
       value: 1,
-      icon: "N",
-      opera: "nd"
+      opera: "nd",
     },
     { 
       type: "macro",
       value: "",
       sides: 32,
-      icon: "M",
     },
     { 
       type: "difference",
-      icon: "D",
       opera: "tor"
       
     },
     { 
       type: "union",
-      icon: "U",
       opera: "tor"
     },
     { 
       type: "intersection",
-      icon: "I",
       opera: "tor",
     },
     { 
       type: "warp",
-      icon: "W",
       opera: "tor"
     },
-    { 
-      type: "point",
-      value: [0, 0],
-      // icon: "Pt",
-      text: "Pt",
-      opera: "nd"
-    },
+    // { 
+    //   type: "point",
+    //   value: [0, 0],
+    //   // icon: "Pt",
+    //   text: "Pt",
+    //   opera: "nd"
+    // },
     { 
       type: "translateX",
-      icon: "TX",
       opera: "tor"
        
     }, 
     { 
       type: "translateY",
-      icon: "TY",
       opera: "tor"
     }, 
     { 
       type: "scaleX",
-      icon: "SX",
       opera: "tor",
     },
     { 
       type: "scaleY",
-      icon: "SY",
       opera: "tor"
     },
     { 
       type: "rotate",
-      icon: "R",
       opera: "tor"
     },
-    { 
-      type: "code",
-      icon: "C",
-      opera: "tor"
-    },
+    // { 
+    //   type: "code",
+    //   icon: "C",
+    //   opera: "tor"
+    // },
     { 
       type: "multiply",
-      icon: "x",
       opera: "tor"
     },
     { 
       type: "plus",
-      icon: "plus",
       opera: "tor"
     },
   ],
@@ -139,6 +191,7 @@ const STATE = {
   editor: null,
   editValue: null
 }
+
 
 const EDITORS = {
   "shape": (value) => html`
@@ -386,16 +439,15 @@ const box = (box, index) => html`
     class="box" 
     data-index=${index}
     style=${`
-      background-image: ${box.icon ? `url('./icons/${box.icon}.png')` : ""}; 
+      background-image: url("${makeIcon(box)}"); 
       background-size: cover; 
       background-position: center;
       border: 1px solid black;
       border-radius: 3px; 
-      background: ${!box.icon ? "white" : ""};
-      display: ${!box.icon ? "flex" : ""};
-      align-items: ${!box.icon ? "center" : ""};
-      font-size: ${!box.icon ? "xx-large" : ""};
-      justify-content: ${!box.icon ? "center" : ""};
+      display: "flex";
+      align-items: "center";
+      font-size: "xx-large";
+      justify-content: "center";
     `}>
     ${!box.icon ? box.text : ""}
   </div>
@@ -410,16 +462,15 @@ const draggableBox = (box, index, name) => {
       data-index=${index}
       data-program-name=${name}
       style=${`
-        background-image: ${box.icon ? `url('./icons/${box.icon}.png')` : ""}; 
+        background-image: url("${makeIcon(box)}"); 
         background-size: cover; 
         background-position: center;
         border: 1px solid black;
         border-radius: 3px; 
-        background: ${!box.icon ? "white" : ""};
-        display: ${!box.icon ? "flex" : ""};
-        align-items: ${!box.icon ? "center" : ""};
-        font-size: ${!box.icon ? "xx-large" : ""};
-        justify-content: ${!box.icon ? "center" : ""};
+        display: "flex";
+        align-items: "center";
+        font-size: "xx-large";
+        justify-content: "center";
       `}>
       ${!box.icon ? box.text : ""}
     </div>
@@ -457,18 +508,18 @@ const drawDragged = (box, mouse) => box === null ? "" : html`
       position: absolute; 
       width: 50px;
       height: 50px;
-      background-image: ${box.data.icon ? `url('./icons/${box.data.icon}.png')` : ""}; 
+      background-image: url("${makeIcon(box.data)}"); 
       background-size: cover; 
       background-position: center;
       border: 1px solid black;
       border-radius: 3px;
       left:${mouse.x-box.shiftX}px; 
       top:${mouse.y-box.shiftY}px;
-      background: ${!box.data.icon ? "white" : ""};
-      display: ${!box.data.icon ? "flex" : ""};
-      align-items: ${!box.data.icon ? "center" : ""};
-      font-size: ${!box.data.icon ? "xx-large" : ""};
-      justify-content: ${!box.data.icon ? "center" : ""};`}>
+      display: "flex";
+      align-items: "center";
+      font-size: "xx-large";
+      justify-content: "center";
+      `}>
       
       ${!box.data.icon ? box.data.text : ""}
       
