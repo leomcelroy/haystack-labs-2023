@@ -104,6 +104,12 @@ let funcMap = {
   'plus':(f,g)=>(t)=>{
     return f(t)+g(t);
   },
+  'smooth':(f,g)=>(t)=>{
+    let a = f(t);
+    let b = g(t);
+    let o = a.map(p=>getSmoothed(getResampledBySpacing(p,0.01),Math.round(b*100)));
+    return o;
+  },
   'warp':(f,g,h,q)=>(t)=>{
     let a = f(t);
     let b = g(t);
@@ -146,7 +152,10 @@ export function runProgram({ programs }) {
 
   for (let i = 0; i < prgm.length; i++){
     let {opera,type} = prgm[i];
-    if (opera == 'nd'){
+    if (type == 'code'){
+      console.log(prgm[i].value,eval(prgm[i].value))
+      stack.push(eval(prgm[i].value));
+    }else if (opera == 'nd'){
       if (type == 'shape'){
         let o = [];
         for (let j = 0; j <= prgm[i].sides; j++){
@@ -215,4 +224,92 @@ function visSvg(fun){
     }
   }
   return o;
+}
+
+
+
+function getSmoothed(poly,smoothingSize,smoothingShape=0){
+  function clamp(a,b,c){
+    return Math.min(Math.max(a,b),c);
+  }
+  function map(value,istart,istop,ostart,ostop){
+    return ostart + (ostop - ostart) * ((value - istart)*1.0 / (istop - istart))
+  }
+  // https://github.com/openframeworks/openFrameworks/blob/c21aba181f5180a8f4c2e0bcbde541a643abecec/libs/openFrameworks/graphics/ofPolyline.inl#L470
+  let n = poly.length;
+  smoothingSize = clamp(smoothingSize, 0, n);
+  smoothingShape = clamp(smoothingShape, 0, 1);
+  
+  // precompute weights and normalization
+  let weights = new Array(smoothingSize);
+  // side weights
+  for(let i = 1; i < smoothingSize; i++) {
+    let curWeight = map(i, 0, smoothingSize, 1, smoothingShape);
+    weights[i] = curWeight;
+  }
+  // make a copy of this polyline
+  let result = poly.map(xy=>[...xy]);
+  let bClosed = true;
+  for(let i = 0; i < n; i++) {
+    let sum = 1; // center weight
+    for(let j = 1; j < smoothingSize; j++) {
+      let curx = 0;
+      let cury = 0;
+      let leftPosition = i - j;
+      let rightPosition = i + j;
+      if(leftPosition < 0 && bClosed) {
+        leftPosition += n;
+      }
+      if(leftPosition >= 0) {
+        curx += poly[leftPosition][0];
+        cury += poly[leftPosition][1];
+        sum += weights[j];
+      }
+      if(rightPosition >= n && bClosed) {
+        rightPosition -= n;
+      }
+      if(rightPosition < n) {
+        curx += poly[rightPosition][0];
+        cury += poly[rightPosition][1];
+        sum += weights[j];
+      }
+      result[i][0] += curx * weights[j];
+      result[i][1] += cury * weights[j];
+    }
+    result[i][0] /= sum;
+    result[i][1] /= sum;
+  }
+  
+  return result;
+}
+
+function getResampledBySpacing(poly0,spacing) {
+  if(spacing==0 || poly0.length == 0) return poly0;
+  let poly = [];
+  let acc_len = [0];
+  let tot_len = 0;
+  for (let i = 0; i < poly0.length-1; i++){
+    let [x0,y0] = poly0[i];
+    let [x1,y1] = poly0[i+1];
+    tot_len += Math.hypot(x1-x0,y1-y0);
+    acc_len.push(tot_len);
+  }
+  function getPointAtLength(l){
+    for (let i = poly0.length-1; i >= 0; i--){
+      if (acc_len[i] <= l){
+        let t = (l - acc_len[i])/(acc_len[i+1] - acc_len[i]);
+        return [
+          poly0[i][0] * (1-t) + poly0[i+1][0] * t,
+          poly0[i][1] * (1-t) + poly0[i+1][1] * t,
+        ];
+      }
+    }
+    return [0,0];
+  }
+
+  for (let f = 0; f < tot_len; f += spacing){
+    poly.push(getPointAtLength(f));
+  }
+  if(poly.length) poly.push(poly0[poly0.length-1]);
+  return poly;
 }

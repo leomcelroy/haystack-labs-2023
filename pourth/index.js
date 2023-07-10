@@ -90,6 +90,11 @@ const STATE = {
       opera: "nd"
     },
     { 
+      type: "number",
+      value: 1,
+      opera: "nd",
+    },
+    { 
       type: "sine",
       frequency: Math.PI,
       amplitude: 1,
@@ -106,19 +111,8 @@ const STATE = {
       opera: "nd"
     },
     { 
-      type: "scale",
-      direction: "xy", // "x" "y"
-      opera: "tor",
-    },
-    { 
-      type: "number",
-      value: 1,
-      opera: "nd",
-    },
-    { 
-      type: "macro",
-      value: "",
-      sides: 32,
+      type: "union",
+      opera: "tor"
     },
     { 
       type: "difference",
@@ -126,15 +120,15 @@ const STATE = {
       
     },
     { 
-      type: "union",
-      opera: "tor"
-    },
-    { 
       type: "intersection",
       opera: "tor",
     },
     { 
       type: "warp",
+      opera: "tor"
+    },
+    { 
+      type: "smooth",
       opera: "tor"
     },
     // { 
@@ -162,20 +156,29 @@ const STATE = {
       opera: "tor"
     },
     { 
+      type: "scale",
+      direction: "xy", // "x" "y"
+      opera: "tor",
+    },
+    { 
       type: "rotate",
       opera: "tor"
     },
-    // { 
-    //   type: "code",
-    //   icon: "C",
-    //   opera: "tor"
-    // },
     { 
       type: "multiply",
       opera: "tor"
     },
     { 
       type: "plus",
+      opera: "tor"
+    },    
+    { 
+      type: "macro",
+      value: "",
+    },
+    { 
+      type: "code",
+      value: "t=>{\n  return t;\n}",
       opera: "tor"
     },
   ],
@@ -339,6 +342,9 @@ const EDITORS = {
   "number": (value) => html`
     <div>number value: ${value.value}</div>
     <input @input=${e => value.value = Number(e.target.value)} .value=${value.value}/>
+  `,
+  "code": (value) => html`
+    <textarea @input=${e => value.value = e.target.value} .value=${value.value} cols="48" rows="24"></textarea>
   `,
 }
 
