@@ -192,6 +192,25 @@ const EDITORS = {
       step="0.0001"  
       .value=${value.shift} 
       @input=${e => value.shift = Number(e.target.value)}>
+
+    <style>
+      .sin-viz {
+        background: white;
+        transform: scale(1, -1);
+      }
+    </style>
+    <svg class="sin-viz" width="250" height="250" viewBox="-1.05 -1.05 2.1 2.1" xmlns="http://www.w3.org/2000/svg">
+      ${drawGrid({
+        xMin: -1,
+        xMax: 1,
+        xStep: 0.1,
+        yMin: -1,
+        yMax: 1,
+        yStep: 0.1,
+      })}
+
+      ${drawSine(value)}
+    </svg>
   `,
   "bezier": (value) => svg`
   <style>
@@ -251,7 +270,7 @@ const EDITORS = {
   `,
   "number": (value) => html`
     <div>number value: ${value.value}</div>
-    <input @input=${e => value.value = e.target.value} .value=${value.value}/>
+    <input @input=${e => value.value = Number(e.target.value)} .value=${value.value}/>
   `,
 }
 
@@ -279,6 +298,17 @@ const drawGrid = ({ xMin, xMax, xStep, yMin, yMax, yStep }) => {
     </g>
 
   `
+}
+
+function drawSine({ frequency, amplitude, phase, shift}) {
+  console.log(frequency, amplitude, phase, shift);
+  const pts = [];
+
+  for (let i = -1; i <= 1; i += 0.05) {
+    // let x = 
+  }
+
+  return svg``
 }
 
 let macroCount = 0;
