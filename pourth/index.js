@@ -10,8 +10,8 @@ import { download } from "./download.js";
 import { addUpload } from "./addUpload.js";
 import * as THREE from 'three';
 import { OrbitControls } from 'orbitControls';
+import { editors } from "./editors.js";
 import { bezierEasing } from "./bezierEasing.js";
-
 import { elsAtLoc } from "./elsAtLoc.js"
 
 
@@ -108,8 +108,16 @@ const STATE = {
       handle0: [.5, 0],
       handle1: [.5, 1],
       end: 1,
+      scale: 1,
       opera: "nd"
     },
+    // { 
+    //   type: "point",
+    //   value: [0, 0],
+    //   // icon: "Pt",
+    //   text: "Pt",
+    //   opera: "nd"
+    // },
     { 
       type: "union",
       opera: "tor"
@@ -148,11 +156,12 @@ const STATE = {
       opera: "tor"
     }, 
     { 
-      type: "scaleX",
-      opera: "tor",
+      type: "difference",
+      opera: "tor"
+      
     },
     { 
-      type: "scaleY",
+      type: "union",
       opera: "tor"
     },
     { 
@@ -426,7 +435,7 @@ function view(state) {
         <button style="width: 150px; height: 30px;" @click=${evalProgram}>run</button>
         <button style="width: 150px; height: 30px;" @click=${() => downloadGCode(state)}>download gcode</button>
         <button style="width: 150px; height: 30px;" @click=${() => {
-          state.programs[`macro_${macroCount}`] = [];
+          state.programs[`m${macroCount}`] = [];
           macroCount++;
         }}>new macro</button>
       </div>
@@ -473,10 +482,10 @@ const draggableBox = (box, index, name) => {
         background-position: center;
         border: 1px solid black;
         border-radius: 3px; 
-        display: "flex";
-        align-items: "center";
-        font-size: "xx-large";
-        justify-content: "center";
+        display: flex;
+        align-items: center;
+        font-size: xx-large;
+        justify-content: center;
       `}>
       ${!box.icon ? box.text : ""}
     </div>
@@ -496,14 +505,34 @@ const drawProgram = ([programName, programData]) => html`
       STATE.programs[newName] = STATE.programs[programName];
       delete STATE.programs[programName];
       console.log(STATE);
-    }}>${programName}</div>
+    }}>
+        <div 
+          class="macro-name"
+          .data=${programName}
+          style=${`
+              display: flex;
+              width: 50px;
+              height: 50px;
+              background: white;
+              border: 1px solid black;
+              border-radius: 3px;
+              display: flex;
+              align-items: center;
+              font-size: large;
+              justify-content: center;
+            `}>
+      
+          ${programName}
+          
+        </div>
+    </div>
     <div class="program-boxes">
       ${programData.map( (box, index) => draggableBox(box, index, programName) )}
       <div 
         class="program-spacer-end" 
         data-program-name=${programName}
         data-index=${programData.length}
-        style="aspect-ratio: 1; padding: 5px; margin: 5px; height: 40px;"></div>
+        style="aspect-ratio: 1; width: 100%; padding: 5px; margin: 5px; height: 40px;"></div>
     </div>
   </div>
 `
@@ -535,7 +564,7 @@ const drawDragged = (box, mouse) => box === null ? "" : html`
 function drawEditor(editor) {
   if (editor === null) return "";
 
-  const editorView = EDITORS[editor.type];
+  const editorView = editors[editor.type];
 
   return html`
     <div class="editor-modal">

@@ -23,6 +23,29 @@ export function addProgramEditting(state) {
       shiftY
     };
 
+    console.log(state.dragId);
+
+    fromToolbox = true;
+  })
+
+  listener("mousedown", ".macro-name", (e) => {
+    const trigger = e.target;
+    if (e.target.data === "main") return;
+
+    const data = {
+      data: {type: 'macro', value: e.target.data },
+      index: 14,
+      name: "",
+      shiftX: 18,
+      shiftY: 19.6015625
+    }
+
+    state.dragId = data;
+
+    data.shiftX = e.clientX - trigger.getBoundingClientRect().left;
+    data.shiftY = e.clientY - trigger.getBoundingClientRect().top;
+
+
     fromToolbox = true;
   })
 
