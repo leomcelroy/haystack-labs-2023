@@ -148,13 +148,6 @@ const STATE = {
       opera: "tor",
       color: [50,0]
     },
-    // { 
-    //   type: "point",
-    //   value: [0, 0],
-    //   // icon: "Pt",
-    //   text: "Pt",
-    //   opera: "nd"
-    // },
     { 
       type: "union",
       opera: "tor",
@@ -188,7 +181,6 @@ const STATE = {
     //   text: "Pt",
     //   opera: "nd"
     // },
-
     { 
       type: "multiply",
       opera: "tor",
@@ -217,7 +209,7 @@ const STATE = {
   dragId: null,
   mouse: {x: 0, y: 0},
   result: null,
-  height: 10,
+  height: 5,
   layers: 50,
   threeLines: [],
   editor: null,
@@ -279,11 +271,18 @@ const box = (box, index) => html`
       background-position: center;
       border: 1px solid black;
       border-radius: 3px; 
+<<<<<<< HEAD:pourth/index.js
       display: "flex";
       align-items: "center";
       font-size: "xx-large";
       justify-content: "center";
       filter: sepia(100%) saturate(${box.color[0]}%) hue-rotate(${box.color[1]}deg);
+=======
+      display: flex;
+      align-items: center;
+      font-size: xx-large;
+      justify-content: center;
+>>>>>>> 2006b1a07de5f9e3f0ab34a020803ccc8abcc14e:potscript/index.js
     `}>
     ${!box.icon ? box.text : ""}
   </div>
@@ -363,10 +362,10 @@ const drawDragged = (box, mouse) => box === null ? "" : html`
       border-radius: 3px;
       left:${mouse.x-box.shiftX}px; 
       top:${mouse.y-box.shiftY}px;
-      display: "flex";
-      align-items: "center";
-      font-size: "xx-large";
-      justify-content: "center";
+      display: flex;
+      align-items: center;
+      font-size: xx-large;
+      justify-content: center;
       filter: sepia(100%) saturate(${box.data.color[0]}%) hue-rotate(${box.data.color[1]}deg);
       `}>
       
