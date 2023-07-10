@@ -159,8 +159,9 @@ export function runProgram({ programs }) {
           return Math.sin((t+phase) / frequency * Math.PI * 2)*amplitude + shift;
         });
       }else if (type == 'bezier'){
+        let {start,end,handle0,handle1} = prgm[i];
+        
         stack.push(function(t){
-          let {start,end,handle0,handle1} = prgm[i];
           return bezierEasing(start,handle0,handle1,end)(t);
         });
       }
@@ -193,7 +194,7 @@ function visSvg(fun){
   let o = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">`;
   
   for (let i = 0; i < 50; i++){
-    let ps = fun(i);
+    let ps = fun(i/50);
     console.log(JSON.stringify(ps));
     for (let j = 0; j < ps.length; j++){
       o += `<path d="M`;

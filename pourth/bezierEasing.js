@@ -41,7 +41,6 @@ function getYForX(x, p0, p1, p2, p3) {
 }
 
 export function bezierEasing(initial, p0, p1, final) {
-
     return x => getYForX(
         x, 
         [ 0, initial ], 
