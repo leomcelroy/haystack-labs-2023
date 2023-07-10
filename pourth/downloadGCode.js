@@ -1,3 +1,5 @@
+import { download } from "./download.js";
+
 export function downloadGCode() {
    const layers = evalProgram();
 
@@ -7,14 +9,15 @@ export function downloadGCode() {
    const lines = [];
 
    layers.forEach(pls => {
-      pls.forEach((pl, i) => {
-         pl.forEach(pt => {
-            const [ x, y, z ] = pl;
+      pls.forEach((pl) => {
+         pl.forEach((pt, i) => {
+            let [ x, y, z ] = pt.map(x => x*10);
+            z += 0.8;
             if (i === 0) {
                lines.push(`G1 X${x} Y${y} Z${z} F1998 E0`);
             } 
          
-            lines.push(`G1 X${x} Y${y} Z${z} F1998 E${.25*i}`);
+            lines.push(`G1 X${x} Y${y} Z${z} F1998 E${.4*i}`);
          })
       })
    })
@@ -41,4 +44,5 @@ export function downloadGCode() {
    `
 
    console.log(gcode);
+   download("pot-gcode", "gcode", gcode);
 }

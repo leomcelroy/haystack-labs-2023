@@ -362,7 +362,7 @@ function view(state) {
       <div style="display: flex; justify-content: space-evenly; padding: 5px">
         <button style="width: 150px; height: 30px;" @click=${() => {
           const json = JSON.stringify(state.programs);
-          download("pot.json", json);
+          download("pot", "json", json);
         }}>save</button>
         <button style="width: 150px; height: 30px;" @click=${evalProgram}>run</button>
         <button style="width: 150px; height: 30px;" @click=${() => downloadGCode(state)}>download gcode</button>
