@@ -86,6 +86,7 @@ html, body {
   padding: 5px;
   overflow: scroll;
   background: gainsboro;
+  flex: 1;
 }
 
 .editor-modal {
