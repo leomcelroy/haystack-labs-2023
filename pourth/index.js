@@ -1,4 +1,5 @@
-import { html, svg, render } from "https://unpkg.com/lit-html@2.6.1/lit-html.js";
+// import { html, svg, render } from "https://unpkg.com/lit-html@2.6.1/lit-html.js";
+import { html, svg, render } from "./lit-html.js";
 import { createListener } from "./createListener.js"
 import { runProgram } from "./runProgram.js"
 import { downloadGCode } from "./downloadGCode.js"
