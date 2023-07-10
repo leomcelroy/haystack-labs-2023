@@ -302,14 +302,26 @@ const drawGrid = ({ xMin, xMax, xStep, yMin, yMax, yStep }) => {
 }
 
 function drawSine({ frequency, amplitude, phase, shift}) {
-  console.log(frequency, amplitude, phase, shift);
   const pts = [];
 
-  for (let i = -1; i <= 1; i += 0.05) {
-    // let x = 
+  for (let i = -1; i <= 1; i += 0.01) {
+    let x = i;
+    let y = Math.sin(frequency*x+phase)*amplitude+shift;
+    pts.push([x, y]);
   }
 
-  return svg``
+  return svg`<path d=${pointsToPath(pts)} stroke-width="0.02" stroke="black" fill="none">`
+}
+
+function pointsToPath(points) {
+    if (points.length === 0) {
+        return "";
+    }
+    
+    const [firstPoint, ...restOfPoints] = points;
+    const moveTo = `M ${firstPoint[0]},${firstPoint[1]}`;
+    const lineTos = restOfPoints.map(pt => `L ${pt[0]},${pt[1]}`).join(" ");
+    return `${moveTo} ${lineTos}`;
 }
 
 let macroCount = 0;
