@@ -86,9 +86,13 @@ export function addProgramEditting(state) {
   listener("mouseup", "", (e) => {
     if (dragged || fromToolbox) return;
 
+    // if (!e.target.matches(".draggable-box")) return;
+
     const els = elsAtLoc(e.clientX, e.clientY, ".draggable-box");
     if (els.length !== 1) return;
     const [ box ] = els;
+    console.log(e.target);
+    // const box = e.target;
     const { programName, index} = box.dataset;
 
     const value = state.programs[programName][index];

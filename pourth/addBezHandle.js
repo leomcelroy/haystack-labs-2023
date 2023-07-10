@@ -45,6 +45,8 @@ export function addBezHandle(state) {
         value[idx][1] = y;
       }
 
+      evalProgram();
+
     }
   })
 

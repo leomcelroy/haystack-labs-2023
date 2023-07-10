@@ -51,6 +51,17 @@ let funcMap = {
     }
     return a;
   },
+  'scale': (f, g) => t => {
+    let a = f(t);
+    let b = g(t);
+    for (let i = 0; i < a.length; i++){
+      for (let j = 0; j < a[i].length; j++){
+        a[i][j][0] *= b;
+        a[i][j][1] *= b;
+      }
+    }
+    return a;
+  },
   'scaleX':(f,g)=>(t)=>{
     let a = f(t);
     let b = g(t);
@@ -160,7 +171,6 @@ export function runProgram({ programs }) {
         
         stack.push(function(t){
           const val = bezierEasing(start,handle0,handle1,end)(t);
-          console.log(t, start, handle0, handle1, end, val);
           return val;
         });
       }

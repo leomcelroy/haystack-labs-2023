@@ -6,37 +6,22 @@ import { downloadGCode } from "./downloadGCode.js"
 import { addProgramEditting } from "./addProgramEditting.js"
 import { addBezHandle } from "./addBezHandle.js"
 import { addPtHandle } from "./addPtHandle.js"
-
+import { download } from "./download.js";
+import { addUpload } from "./addUpload.js";
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from 'orbitControls';
 
 import { elsAtLoc } from "./elsAtLoc.js"
 
 const STATE = {
   boxes: [ 
     { 
-      color: "blue", 
       type: "shape",
       sides: 32,
       icon: "shape",
       opera: "nd"
     },
     { 
-      color: "blue", 
-      type: "number",
-      value: 1,
-      icon: "N",
-      opera: "nd"
-    },
-    { 
-      color: "blue", 
-      type: "macro",
-      value: "",
-      sides: 32,
-      icon: "M",
-    },
-    { 
-      color: "auburn", 
       type: "sine",
       frequency: Math.PI,
       amplitude: 1,
@@ -46,39 +31,6 @@ const STATE = {
       opera: "nd"
     },
     { 
-      color: "blue", 
-      type: "difference",
-      icon: "D",
-      opera: "tor"
-      
-    },
-    { 
-      color: "blue", 
-      type: "union",
-      icon: "U",
-      opera: "tor"
-    },
-    { 
-      color: "blue", 
-      type: "intersection",
-      icon: "I",
-      opera: "tor",
-    },
-    { 
-      color: "blue", 
-      type: "warp",
-      icon: "W",
-      opera: "tor"
-    },
-    { 
-      color: "blue", 
-      type: "point",
-      value: [0, 0],
-      icon: "Pt",
-      opera: "nd"
-    },
-    { 
-      color: "pink", 
       type: "bezier",
       start: 0,
       handle0: [.5, 0],
@@ -88,50 +40,88 @@ const STATE = {
       opera: "nd"
     },
     { 
-      color: "yellow", 
+      type: "scale",
+      direction: "xy", // "x" "y"
+      opera: "tor",
+      text: "S"
+    },
+    { 
+      type: "number",
+      value: 1,
+      icon: "N",
+      opera: "nd"
+    },
+    { 
+      type: "macro",
+      value: "",
+      sides: 32,
+      icon: "M",
+    },
+    { 
+      type: "difference",
+      icon: "D",
+      opera: "tor"
+      
+    },
+    { 
+      type: "union",
+      icon: "U",
+      opera: "tor"
+    },
+    { 
+      type: "intersection",
+      icon: "I",
+      opera: "tor",
+    },
+    { 
+      type: "warp",
+      icon: "W",
+      opera: "tor"
+    },
+    { 
+      type: "point",
+      value: [0, 0],
+      // icon: "Pt",
+      text: "Pt",
+      opera: "nd"
+    },
+    { 
       type: "translateX",
       icon: "TX",
       opera: "tor"
        
     }, 
     { 
-      color: "green", 
       type: "translateY",
       icon: "TY",
       opera: "tor"
     }, 
     { 
-      color: "orange", 
       type: "scaleX",
       icon: "SX",
       opera: "tor",
     },
     { 
-      color: "purple",
       type: "scaleY",
       icon: "SY",
       opera: "tor"
     },
     { 
-      color: "grey",
       type: "rotate",
       icon: "R",
       opera: "tor"
     },
     { 
-      color: "red", 
       type: "code",
       icon: "C",
       opera: "tor"
     },
     { 
-      color: "red", 
       type: "multiply",
       icon: "x",
       opera: "tor"
     },
     { 
-      color: "red", 
       type: "plus",
       icon: "plus",
       opera: "tor"
@@ -145,7 +135,7 @@ const STATE = {
   result: null,
   height: 10,
   layers: 50,
-  shape: 0,
+  threeLines: [],
   editor: null,
   editValue: null
 }
@@ -159,7 +149,10 @@ const EDITORS = {
       max="100" 
       step="1"
       .value=${value.sides} 
-      @input=${e => value.sides = Number(e.target.value)}>
+      @input=${e => {
+        value.sides = Number(e.target.value);
+        evalProgram();
+      }}>
   `,
   "sine": (value) => html`
     <div>Frequency: ${value.frequency.toFixed(3)}</div>
@@ -169,7 +162,10 @@ const EDITORS = {
       max="10"
       step="0.00001" 
       .value=${value.frequency} 
-      @input=${e => value.frequency = Number(e.target.value)}>
+      @input=${e => {
+        value.frequency = Number(e.target.value);
+        evalProgram();
+      }}>
 
     <div>Amplitude: ${value.amplitude.toFixed(3)}</div>
     <input 
@@ -178,7 +174,10 @@ const EDITORS = {
       max="2"
       step="0.001"  
       .value=${value.amplitude} 
-      @input=${e => value.amplitude = Number(e.target.value)}>
+      @input=${e => {
+        value.amplitude = Number(e.target.value);
+        evalProgram();
+      }}>
 
     <div>Phase: ${value.phase.toFixed(3)}</div>
     <input 
@@ -187,7 +186,10 @@ const EDITORS = {
       max="2"
       step="0.0001"  
       .value=${value.phase} 
-      @input=${e => value.phase = Number(e.target.value)}>
+      @input=${e => {
+        value.phase = Number(e.target.value);
+        evalProgram();
+      }}>
 
     <div>Shift: ${value.shift.toFixed(3)}</div>
     <input 
@@ -196,7 +198,10 @@ const EDITORS = {
       max="2"
       step="0.0001"  
       .value=${value.shift} 
-      @input=${e => value.shift = Number(e.target.value)}>
+      @input=${e => { 
+        value.shift = Number(e.target.value); 
+        evalProgram();
+      }}>
 
     <style>
       .sin-viz {
@@ -206,14 +211,14 @@ const EDITORS = {
         border-radius: 3px;
       }
     </style>
-    <svg class="sin-viz" width="250" height="250" viewBox="-1.05 -1.05 2.1 2.1" xmlns="http://www.w3.org/2000/svg">
+    <svg class="sin-viz" width="250" height="250" viewBox="-5 -5 10 10" xmlns="http://www.w3.org/2000/svg">
       ${drawGrid({
-        xMin: -1,
-        xMax: 1,
-        xStep: 0.1,
-        yMin: -1,
-        yMax: 1,
-        yStep: 0.1,
+        xMin: -5,
+        xMax: 5,
+        xStep: 1,
+        yMin: -5,
+        yMax: 5,
+        yStep: 1,
       })}
 
       ${drawSine(value)}
@@ -313,7 +318,7 @@ const drawGrid = ({ xMin, xMax, xStep, yMin, yMax, yStep }) => {
 function drawSine({ frequency, amplitude, phase, shift}) {
   const pts = [];
 
-  for (let i = -1; i <= 1; i += 0.001) {
+  for (let i = -5; i <= 5; i += 0.001) {
     let x = i;
     let y = Math.sin((x+phase) * frequency * Math.PI * 2)*amplitude + shift;
     pts.push([x, y]);
@@ -355,32 +360,11 @@ function view(state) {
         ${prioritizeKey(Object.entries(state.programs), "main").map(drawProgram)}
       </div>
       <div style="display: flex; justify-content: space-evenly; padding: 5px">
-        <button style="width: 150px; height: 30px;">save</button>
-        <button style="width: 150px; height: 30px;">upload</button>
-        <button style="width: 150px; height: 30px;" @click=${() => { 
-          const fn = runProgram(state);
-
-          const { height, layers } = state;
-          const shape = [];
-
-          for (let i = 0; i < layers; i += 1) { 
-            const t = i/(layers-1);
-            const z = t*height;
-            const pls = fn(t).map(pl => pl.map(pt => [...pt, z]));
-            shape.push(pls);
-          }
-
-          console.log(shape);
-
-          state.shape = shape;
-
-          if (state.animId) cancelAnimationFrame(state.animId);
-
-          document.querySelector(".render-target").innerHTML = "";
-
-          renderLines(shape.flat(), document.querySelector(".render-target"));
-
-        }}>run</button>
+        <button style="width: 150px; height: 30px;" @click=${() => {
+          const json = JSON.stringify(state.programs);
+          download("pot.json", json);
+        }}>save</button>
+        <button style="width: 150px; height: 30px;" @click=${evalProgram}>run</button>
         <button style="width: 150px; height: 30px;" @click=${() => downloadGCode(state)}>download gcode</button>
         <button style="width: 150px; height: 30px;" @click=${() => {
           state.programs[`macro_${macroCount}`] = [];
@@ -402,13 +386,18 @@ const box = (box, index) => html`
     class="box" 
     data-index=${index}
     style=${`
-      background: ${box.color};
-      background-image: url('./icons/${box.icon ?? "default"}.png'); 
+      background-image: ${box.icon ? `url('./icons/${box.icon}.png')` : ""}; 
       background-size: cover; 
       background-position: center;
       border: 1px solid black;
       border-radius: 3px; 
+      background: ${!box.icon ? "white" : ""};
+      display: ${!box.icon ? "flex" : ""};
+      align-items: ${!box.icon ? "center" : ""};
+      font-size: ${!box.icon ? "xx-large" : ""};
+      justify-content: ${!box.icon ? "center" : ""};
     `}>
+    ${!box.icon ? box.text : ""}
   </div>
 `
 
@@ -421,13 +410,19 @@ const draggableBox = (box, index, name) => {
       data-index=${index}
       data-program-name=${name}
       style=${`
-        background: ${box.color};
-        background-image: url('./icons/${box.icon ?? "default"}.png'); 
+        background-image: ${box.icon ? `url('./icons/${box.icon}.png')` : ""}; 
         background-size: cover; 
         background-position: center;
         border: 1px solid black;
-        border-radius: 3px;
+        border-radius: 3px; 
+        background: ${!box.icon ? "white" : ""};
+        display: ${!box.icon ? "flex" : ""};
+        align-items: ${!box.icon ? "center" : ""};
+        font-size: ${!box.icon ? "xx-large" : ""};
+        justify-content: ${!box.icon ? "center" : ""};
       `}>
+      ${!box.icon ? box.text : ""}
+    </div>
         
       </div>
   `
@@ -456,20 +451,26 @@ const drawProgram = ([programName, programData]) => html`
   </div>
 `
 
-const drawDragged = (dragged, mouse) => dragged === null ? "" : html`
+const drawDragged = (box, mouse) => box === null ? "" : html`
   <div 
     style=${`
       position: absolute; 
       width: 50px;
       height: 50px;
-      background: ${dragged.data.color};
-      background-image: url('./icons/${dragged.data.icon ?? "default"}.png'); 
+      background-image: ${box.data.icon ? `url('./icons/${box.data.icon}.png')` : ""}; 
       background-size: cover; 
       background-position: center;
       border: 1px solid black;
       border-radius: 3px;
-      left:${mouse.x-dragged.shiftX}px; 
-      top:${mouse.y-dragged.shiftY}px;`}>
+      left:${mouse.x-box.shiftX}px; 
+      top:${mouse.y-box.shiftY}px;
+      background: ${!box.data.icon ? "white" : ""};
+      display: ${!box.data.icon ? "flex" : ""};
+      align-items: ${!box.data.icon ? "center" : ""};
+      font-size: ${!box.data.icon ? "xx-large" : ""};
+      justify-content: ${!box.data.icon ? "center" : ""};`}>
+      
+      ${!box.data.icon ? box.data.text : ""}
       
   </div>
 `
@@ -511,7 +512,7 @@ addPtHandle(STATE);
 window.STATE = STATE;
 
 
-function renderLines(lines, domElement, lineThickness = 0.1) {
+function renderLines(domElement) {
   // Get the dimensions of the DOM element
   const width = domElement.clientWidth;
   const height = domElement.clientHeight;
@@ -534,17 +535,6 @@ function renderLines(lines, domElement, lineThickness = 0.1) {
   renderer.setSize(width, height);
   domElement.appendChild(renderer.domElement);
 
-  // Create a material
-  const material = new THREE.LineBasicMaterial({
-    color: 0x00ff00,
-    linewidth: lineThickness,
-  });
-
-  lines.forEach(polyline => {
-    const geometry = new THREE.BufferGeometry().setFromPoints(polyline.map(pt => new THREE.Vector3(pt[0], pt[2], pt[1])));
-    const line = new THREE.Line(geometry, material);
-    scene.add(line);
-  });
 
   // Add OrbitControls for panning and zooming
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -564,6 +554,61 @@ function renderLines(lines, domElement, lineThickness = 0.1) {
     return id;
   }
 
- STATE.animId = animate();
+ animate();
+
+ return scene;
 }
+
+addUpload(document.body, STATE);
+
+STATE.scene = renderLines(document.querySelector(".render-target"));
+
+function addLines(scene, lines, lineThickness = 0.015) {
+  while (STATE.threeLines.length) {
+    const threeLine = STATE.threeLines.pop();
+    STATE.scene.remove(threeLine);
+  }
+
+  // Create a material
+  const material = new THREE.LineBasicMaterial({
+    color: 0x00ff00,
+    linewidth: lineThickness,
+  });
+
+  const threeLines = [];
+  lines.forEach(polyline => {
+    const geometry = new THREE.BufferGeometry().setFromPoints(polyline.map(pt => new THREE.Vector3(pt[0], pt[2], pt[1])));
+    const line = new THREE.Line(geometry, material);
+    threeLines.push(line);
+    scene.add(line);
+  });
+
+  STATE.threeLines = threeLines;
+
+}
+
+function evalProgram() {
+
+  const fn = runProgram(STATE);
+
+  const { height, layers } = STATE;
+  const shape = [];
+
+  for (let i = 0; i < layers; i += 1) { 
+    const t = i/(layers-1);
+    const z = t*height;
+    const pls = fn(t).map(pl => pl.map(pt => [...pt, z]));
+    shape.push(pls);
+  }
+
+
+
+
+  addLines(STATE.scene, shape.flat());
+
+  return shape;
+     
+}
+
+window.evalProgram = evalProgram;
 

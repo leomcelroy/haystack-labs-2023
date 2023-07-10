@@ -5,6 +5,7 @@ html, body {
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
+  font-family: sans-serif;
 }
 
 .box-container {
@@ -55,12 +56,12 @@ html, body {
 }
 
 .view-window {
-  flex: 1;
+  height: 60%;
   background: black;
 }
 
 .dictionary {
-  max-height: 30%;
+  flex: 1;
   background: #f4f3f3;
   padding: 5px;
   overflow: scroll;
