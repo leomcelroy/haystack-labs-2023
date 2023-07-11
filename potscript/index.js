@@ -251,8 +251,8 @@ const STATE = {
   mouse: {x: 0, y: 0},
   result: null,
   height: 5,
-  layers: 50,
-  scale: 1,
+  layers: 80,
+  scale: 10,
   threeLines: [],
   editor: null,
   editValue: null

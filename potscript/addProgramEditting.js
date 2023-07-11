@@ -8,7 +8,7 @@ export function addProgramEditting(state) {
   let fromToolbox = false;
   let dragged = false;
 
-  listener("mousedown", ".box", (e) => {
+  listener("pointerdown", ".box", (e) => {
     const trigger = e.target;
     const index = Number(trigger.dataset.index);
     const data = state.boxes[index];
@@ -28,7 +28,7 @@ export function addProgramEditting(state) {
     fromToolbox = true;
   })
 
-  listener("mousedown", ".macro-name", (e) => {
+  listener("pointerdown", ".macro-name", (e) => {
     const trigger = e.target;
     if (e.target.data === "main") return;
 
@@ -50,7 +50,7 @@ export function addProgramEditting(state) {
     fromToolbox = true;
   })
 
-  listener("mousedown", ".draggable-box", (e) => {
+  listener("pointerdown", ".draggable-box", (e) => {
     const trigger = e.target;
     const index = Number(trigger.dataset.index);
     const name = trigger.dataset.programName;
@@ -69,7 +69,7 @@ export function addProgramEditting(state) {
 
   });
 
-  listener("mousemove", "", e => {
+  listener("pointermove", "", e => {
     if (removed) return;
     if (fromToolbox) return;
     if (state.dragId === null) return;
@@ -85,7 +85,7 @@ export function addProgramEditting(state) {
     dragged = true;
   })
 
-  listener("mouseup", "", e => {
+  listener("pointerup", "", e => {
 
     if (!removed && !fromToolbox) return;
     if (state.dragId === null) return;
@@ -107,7 +107,7 @@ export function addProgramEditting(state) {
   
   })
 
-  listener("mouseup", "", (e) => {
+  listener("pointerup", "", (e) => {
     if (dragged || fromToolbox) return;
 
     // if (!e.target.matches(".draggable-box")) return;
@@ -124,7 +124,7 @@ export function addProgramEditting(state) {
     state.editor = value;
   })
 
-  listener("mouseup", "", e => {
+  listener("pointerup", "", e => {
 
     removed = false;
     fromToolbox = false;
