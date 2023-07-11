@@ -3,6 +3,7 @@ import { html, svg, render } from "./lit-html.js";
 import { createListener } from "./createListener.js"
 import { runProgram } from "./runProgram.js"
 import { downloadGCode } from "./downloadGCode.js"
+import { downloadSTL } from "./downloadSTL.js"
 import { addProgramEditting } from "./addProgramEditting.js"
 import { addBezHandle } from "./addBezHandle.js"
 import { addPtHandle } from "./addPtHandle.js"
@@ -291,6 +292,7 @@ function view(state) {
         }}>save</button>
         <button style="width: 150px; height: 30px;" @click=${evalProgram}>run</button>
         <button style="width: 150px; height: 30px;" @click=${() => downloadGCode(state)}>download gcode</button>
+        <button style="width: 150px; height: 30px;" @click=${() => downloadSTL(state)}>download stl</button>
         <button style="width: 150px; height: 30px;" @click=${() => {
           state.programs[`m${macroCount}`] = [];
           macroCount++;
