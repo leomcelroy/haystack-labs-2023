@@ -191,6 +191,7 @@ const STATE = {
   result: null,
   height: 5,
   layers: 50,
+  scale: 1,
   threeLines: [],
   editor: null,
   editValue: null
@@ -210,6 +211,9 @@ function view(state) {
           </div>
           <div style="padding: 5px; display: flex; justify-content: space-between;">
             <span style="padding-right: 5px;">layers</span><input style="width: 70px;" .value=${state.layers} @input=${e => { state.layers = Number(e.target.value)}}/>
+          </div>
+          <div style="padding: 5px; display: flex; justify-content: space-between;">
+            <span style="padding-right: 5px;">scale</span><input style="width: 70px;" .value=${state.scale} @input=${e => { state.scale = Number(e.target.value)}}/>
           </div>
         </div>
       </div>
