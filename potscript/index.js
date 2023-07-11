@@ -276,6 +276,9 @@ function view(state) {
           <div style="padding: 5px; display: flex; justify-content: space-between;">
             <span style="padding-right: 5px;">scale</span><input style="width: 70px;" .value=${state.scale} @input=${e => { state.scale = Number(e.target.value)}}/>
           </div>
+          <div style="padding: 5px; display: flex; justify-content: space-between;">
+            Layer Height: ${(state.height*state.scale/state.layers).toFixed(2)}
+          </div>
         </div>
       </div>
 
