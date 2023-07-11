@@ -155,6 +155,90 @@ export const editors = {
       ${drawNoise(value)}
     </svg>
   `,
+  "thresh": (value) => html`
+  <div>Threshold: ${value.thresh.toFixed(3)}</div>
+  <input
+  .value=${value.thresh} 
+  @input=${e => {
+    let n = Number(e.target.value);
+    if (!isNaN(n) && e.target.value.length){
+      value.thresh = n;
+    }
+    evalProgram();
+  }}>
+  <input 
+    type="range" 
+    min="0" 
+    max="1"
+    step="0.00001" 
+    .value=${value.thresh} 
+    @input=${e => {
+      value.thresh = Number(e.target.value);
+      evalProgram();
+    }}>
+
+  <div>Left: ${value.left.toFixed(3)}</div>
+  <input
+  .value=${value.left} 
+  @input=${e => {
+    let n = Number(e.target.value);
+    if (!isNaN(n) && e.target.value.length){
+      value.left = n;
+    }
+    evalProgram();
+  }}>
+  <input 
+    type="range" 
+    min="-10" 
+    max="10"
+    step="0.001"  
+    .value=${value.left} 
+    @input=${e => {
+      value.left = Number(e.target.value);
+      evalProgram();
+    }}>
+
+  <div>Right: ${value.right.toFixed(3)}</div>
+  <input
+  .value=${value.right} 
+  @input=${e => {
+    let n = Number(e.target.value);
+    if (!isNaN(n) && e.target.value.length){
+      value.right = n;
+    }
+    evalProgram();
+  }}>
+  <input 
+    type="range" 
+    min="-10" 
+    max="10"
+    step="0.0001"  
+    .value=${value.right} 
+    @input=${e => {
+      value.right = Number(e.target.value);
+      evalProgram();
+    }}>
+  <style>
+    .sin-viz {
+      background: white;
+      transform: scale(1, -1);
+      border: 1px solid black;
+      border-radius: 3px;
+    }
+  </style>
+  <svg class="sin-viz" width="250" height="250" viewBox="-5 -5 10 10" xmlns="http://www.w3.org/2000/svg">
+    ${drawGrid({
+      xMin: -5,
+      xMax: 5,
+      xStep: 1,
+      yMin: -5,
+      yMax: 5,
+      yStep: 1,
+    })}
+
+    ${drawThresh(value)}
+  </svg>
+`,
   "bezier": (value) => svg`
   <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; flex-direction:column;">
   <style>
@@ -230,6 +314,15 @@ export const editors = {
   "number": (value) => html`
     <div>Number: ${value.value.toFixed(2)}</div>
     <input 
+    .value=${value.value} 
+    @input=${e => {
+      let n = Number(e.target.value);
+      if (!isNaN(n) && e.target.value.length){
+        value.value = n;
+      }
+      evalProgram();
+    }}>
+    <input 
       type="range" 
       min="-20" 
       max="20" 
@@ -292,6 +385,16 @@ function drawNoise({ frequency, amplitude, phase, shift}) {
     pts.push([x, y]);
   }
 
+  return svg`<path d=${pointsToPath(pts)} stroke-width="0.02" stroke="black" fill="none">`
+}
+
+function drawThresh({ thresh, left, right}) {
+  const pts = [];
+  for (let i = -5; i <= 5; i += 0.001) {
+    let x = i;
+    let y = (i < thresh) ? left : right
+    pts.push([x, y]);
+  }
   return svg`<path d=${pointsToPath(pts)} stroke-width="0.02" stroke="black" fill="none">`
 }
 

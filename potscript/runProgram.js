@@ -192,6 +192,11 @@ export function runProgram({ programs }) {
         stack.push(function(t){
           return noise((t+phase) * frequency )*amplitude + shift;
         })
+      }else if (type == 'thresh'){
+        let {thresh,left,right} = prgm[i];
+        stack.push(function(t){
+          return t < thresh ? left : right;
+        })
       }
     }else if (opera == 'tor'){
       if (type == 'warp'){

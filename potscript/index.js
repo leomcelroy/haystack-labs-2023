@@ -62,6 +62,14 @@ function makeIcon(box){
       }
       s += `" fill="none" stroke="black" stroke-width="3"/>`
       return svg2url(s);
+    }else if (box.type == 'thresh'){
+      let {thresh, left, right} = box;
+      left=100-left*100
+      right=100-right*100
+      thresh*=100;
+      let s = `<path d="M ${0} ${left} ${thresh} ${left} ${thresh} ${right} ${100} ${right}`;
+      s += `" fill="none" stroke="black" stroke-width="3"/>`
+      return svg2url(s);
     }else if (box.type == 'shape'){
       let {sides} = box;
       let s = `<path d="M `;
@@ -132,6 +140,14 @@ const STATE = {
       amplitude: 1,
       phase: 0,
       shift: 0,
+      opera: "nd",
+      color: [200,0]
+    },
+    {
+      type: "thresh",
+      thresh:0.5,
+      left:0,
+      right:1,
       opera: "nd",
       color: [200,0]
     },
