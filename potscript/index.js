@@ -128,7 +128,7 @@ const STATE = {
     },
     {
       type: "noise",
-      frequency: 1,
+      frequency: Math.PI,
       amplitude: 1,
       phase: 0,
       shift: 0,

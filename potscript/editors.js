@@ -1,4 +1,5 @@
 import { html, svg, render } from "./lit-html.js";
+import { noise } from "./noise.js";
 
 export const editors = {
   "shape": (value) => html`
@@ -82,6 +83,76 @@ export const editors = {
       })}
 
       ${drawSine(value)}
+    </svg>
+  `,
+  "noise": (value) => html`
+    <div>Frequency: ${value.frequency.toFixed(3)}</div>
+    <input 
+      type="range" 
+      min="0" 
+      max="10"
+      step="0.00001" 
+      .value=${value.frequency} 
+      @input=${e => {
+        value.frequency = Number(e.target.value);
+        evalProgram();
+      }}>
+
+    <div>Amplitude: ${value.amplitude.toFixed(3)}</div>
+    <input 
+      type="range" 
+      min="0" 
+      max="2"
+      step="0.001"  
+      .value=${value.amplitude} 
+      @input=${e => {
+        value.amplitude = Number(e.target.value);
+        evalProgram();
+      }}>
+
+    <div>Phase: ${value.phase.toFixed(3)}</div>
+    <input 
+      type="range" 
+      min="-2" 
+      max="2"
+      step="0.0001"  
+      .value=${value.phase} 
+      @input=${e => {
+        value.phase = Number(e.target.value);
+        evalProgram();
+      }}>
+
+    <div>Shift: ${value.shift.toFixed(3)}</div>
+    <input 
+      type="range" 
+      min="-2" 
+      max="2"
+      step="0.0001"  
+      .value=${value.shift} 
+      @input=${e => { 
+        value.shift = Number(e.target.value); 
+        evalProgram();
+      }}>
+
+    <style>
+      .sin-viz {
+        background: white;
+        transform: scale(1, -1);
+        border: 1px solid black;
+        border-radius: 3px;
+      }
+    </style>
+    <svg class="sin-viz" width="250" height="250" viewBox="-5 -5 10 10" xmlns="http://www.w3.org/2000/svg">
+      ${drawGrid({
+        xMin: -5,
+        xMax: 5,
+        xStep: 1,
+        yMin: -5,
+        yMax: 5,
+        yStep: 1,
+      })}
+
+      ${drawNoise(value)}
     </svg>
   `,
   "bezier": (value) => svg`
@@ -207,6 +278,17 @@ function drawSine({ frequency, amplitude, phase, shift}) {
   for (let i = -5; i <= 5; i += 0.001) {
     let x = i;
     let y = Math.sin((x+phase) * frequency * Math.PI * 2)*amplitude + shift;
+    pts.push([x, y]);
+  }
+
+  return svg`<path d=${pointsToPath(pts)} stroke-width="0.02" stroke="black" fill="none">`
+}
+function drawNoise({ frequency, amplitude, phase, shift}) {
+  const pts = [];
+
+  for (let i = -5; i <= 5; i += 0.001) {
+    let x = i;
+    let y = noise((x+phase) * frequency )*amplitude + shift;
     pts.push([x, y]);
   }
 
