@@ -157,9 +157,18 @@ export const editors = {
     <input @input=${e => value.value = e.target.value} .value=${value.value}/>
   `,
   "number": (value) => html`
-    <div>number value: ${value.value}</div>
-    <input @input=${e => value.value = Number(e.target.value)} .value=${value.value}/>
-  `,
+    <div>Number: ${value.value.toFixed(2)}</div>
+    <input 
+      type="range" 
+      min="-20" 
+      max="20" 
+      step=".01"
+      .value=${value.value} 
+      @input=${e => {
+        value.value = Number(e.target.value);
+        evalProgram();
+      }}>
+    `,
   "code": (value) => html`
     <textarea @input=${e => value.value = e.target.value} .value=${value.value} cols="48" rows="24"></textarea>
   `,

@@ -236,6 +236,7 @@ const STATE = {
   result: null,
   height: 5,
   layers: 50,
+  scale: 1,
   threeLines: [],
   editor: null,
   editValue: null
@@ -255,6 +256,9 @@ function view(state) {
           </div>
           <div style="padding: 5px; display: flex; justify-content: space-between;">
             <span style="padding-right: 5px;">layers</span><input style="width: 70px;" .value=${state.layers} @input=${e => { state.layers = Number(e.target.value)}}/>
+          </div>
+          <div style="padding: 5px; display: flex; justify-content: space-between;">
+            <span style="padding-right: 5px;">scale</span><input style="width: 70px;" .value=${state.scale} @input=${e => { state.scale = Number(e.target.value)}}/>
           </div>
         </div>
       </div>
@@ -296,11 +300,11 @@ const box = (box, index) => html`
       background-position: center;
       border: 1px solid black;
       border-radius: 3px; 
-      display: "flex";
-      align-items: "center";
-      font-size: "xx-large";
-      justify-content: "center";
-      filter: sepia(100%) saturate(${box.color[0]}%) hue-rotate(${box.color[1]}deg);
+      display: flex;
+      align-items: center;
+      font-size: xx-large;
+      justify-content: center;
+      filter: sepia(100%) saturate(${box?.color ? box.color[0] : 0}%) hue-rotate(${box?.color ? box.color[1] : 0}deg);
     `}>
     ${!box.icon ? box.text : ""}
   </div>
@@ -324,7 +328,7 @@ const draggableBox = (box, index, name) => {
         align-items: center;
         font-size: xx-large;
         justify-content: center;
-        filter: sepia(100%) saturate(${box.color[0]}%) hue-rotate(${box.color[1]}deg);
+        filter: sepia(100%) saturate(${box?.color ? box.color[0] : 0}%) hue-rotate(${box?.color ? box.color[1] : 0}deg);
       `}>
       ${!box.icon ? box.text : ""}
     </div>
@@ -384,7 +388,7 @@ const drawDragged = (box, mouse) => box === null ? "" : html`
       align-items: center;
       font-size: xx-large;
       justify-content: center;
-      filter: sepia(100%) saturate(${box.data.color[0]}%) hue-rotate(${box.data.color[1]}deg);
+      filter: sepia(100%) saturate(${box?.data?.color ? box?.data?.color[0] : 0}%) hue-rotate(${box?.data?.color ? box?.data?.color[1] : 0}deg);
       `}>
       
       ${!box.data.icon ? box.data.text : ""}

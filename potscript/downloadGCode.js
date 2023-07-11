@@ -1,6 +1,6 @@
 import { download } from "./download.js";
 
-export function downloadGCode() {
+export function downloadGCode({ scale }) {
    const layers = evalProgram();
 
    console.log(layers);
@@ -11,7 +11,7 @@ export function downloadGCode() {
    layers.forEach(pls => {
       pls.forEach((pl) => {
          pl.forEach((pt, i) => {
-            let [ x, y, z ] = pt.map(x => x*10);
+            let [ x, y, z ] = pt.map(x => x*scale);
             z += 0.8;
             if (i === 0) {
                lines.push(`G1 X${x} Y${y} Z${z} F1998 E0`);

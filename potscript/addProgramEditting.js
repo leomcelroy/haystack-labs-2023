@@ -36,8 +36,9 @@ export function addProgramEditting(state) {
       data: {type: 'macro', value: e.target.data },
       index: 0,
       name: "",
-      shiftX: 18,
-      shiftY: 19.6015625
+      shiftX: 0,
+      shiftY: 0,
+      color: [0,0]
     }
 
     state.dragId = data;
