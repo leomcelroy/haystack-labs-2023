@@ -8,7 +8,7 @@ export function addBezHandle(state) {
   let draggedElement = null;
   let svg = null;
 
-  listener("mousedown", ".bez-handle", (e) => {
+  listener("pointerdown", ".bez-handle", (e) => {
     const els = elsAtLoc(e.clientX, e.clientY, ".bez-handle");
 
     if (els.length === 0) return;
@@ -19,7 +19,7 @@ export function addBezHandle(state) {
     svg = draggedElement.ownerSVGElement;
   })
 
-  listener("mousemove", "", e => {
+  listener("pointermove", "", e => {
     if (draggedElement && svg) {
       let pt = svg.createSVGPoint();
       pt.x = e.clientX;
@@ -50,7 +50,7 @@ export function addBezHandle(state) {
     }
   })
 
-  listener("mouseup", "", e => {
+  listener("pointerup", "", e => {
     if (draggedElement) {
       draggedElement.setAttribute('pointer-events', 'all');
       draggedElement = null;

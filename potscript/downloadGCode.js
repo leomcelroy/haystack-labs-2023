@@ -1,23 +1,37 @@
 import { download } from "./download.js";
 
-export function downloadGCode({ scale }) {
-   const layers = evalProgram();
+export function downloadGCode({ scale, height, layers }) {
+   const layerShapes = evalProgram();
 
-   console.log(layers);
+   console.log(layerShapes);
+
+   const totalHeight = scale*height;
+   const layerHeight = totalHeight/layers;
+
+   console.log(layerHeight);
 
 
    const lines = [];
+   let lastPt = null;
+   let totalE = 0;
+   
 
-   layers.forEach(pls => {
+   layerShapes.forEach(pls => {
       pls.forEach((pl) => {
          pl.forEach((pt, i) => {
-            let [ x, y, z ] = pt.map(x => x*scale);
-            z += 0.8;
+            pt = pt.map(x => x*scale);
+            let [ x, y, z ] = pt;
+            z += layerHeight;
             if (i === 0) {
-               lines.push(`G1 X${x} Y${y} Z${z} F1998 E0`);
+               lines.push(`G1 X${x} Y${y} Z${z} F1998 E${totalE}`);
             } 
+
+            const eDelta = lastPt ? dist(lastPt, pt)/8 : 0;
+            totalE += eDelta
          
-            lines.push(`G1 X${x} Y${y} Z${z} F1998 E${.4*i}`);
+            lines.push(`G1 X${x} Y${y} Z${z} F1998 E${totalE}`);
+
+            lastPt = pt;
          })
       })
    })
@@ -30,13 +44,9 @@ export function downloadGCode({ scale }) {
     G28 ; home all axes
     M92 E400
     G1 Z2.800 F3600
-    ; process Process1
-    ; layer 1, Z = 0.800
+    G92 E0
     T0
     ${lines.join("\n")}
-    G92 E0
-    G1 E0.0000 F4800
-    ; layer end
     M104 S0 ; turn off extruder
     M140 S0 ; turn off bed
     G28 ; home all axes
@@ -45,4 +55,12 @@ export function downloadGCode({ scale }) {
 
    console.log(gcode);
    download("pot-gcode", "gcode", gcode);
+}
+
+function dist([x1, y1, z1], [x2, y2, z2]) {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    let dz = z2 - z1;
+
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
 }
