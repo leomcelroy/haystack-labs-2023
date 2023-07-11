@@ -275,18 +275,11 @@ const box = (box, index) => html`
       background-position: center;
       border: 1px solid black;
       border-radius: 3px; 
-<<<<<<< HEAD:pourth/index.js
-      display: "flex";
-      align-items: "center";
-      font-size: "xx-large";
-      justify-content: "center";
-      filter: sepia(100%) saturate(${box.color[0]}%) hue-rotate(${box.color[1]}deg);
-=======
       display: flex;
       align-items: center;
       font-size: xx-large;
       justify-content: center;
->>>>>>> 2006b1a07de5f9e3f0ab34a020803ccc8abcc14e:potscript/index.js
+      filter: sepia(100%) saturate(${box?.color ? box.color[0] : 0}%) hue-rotate(${box?.color ? box.color[1] : 0}deg);
     `}>
     ${!box.icon ? box.text : ""}
   </div>
@@ -310,7 +303,7 @@ const draggableBox = (box, index, name) => {
         align-items: center;
         font-size: xx-large;
         justify-content: center;
-        filter: sepia(100%) saturate(${box.color[0]}%) hue-rotate(${box.color[1]}deg);
+        filter: sepia(100%) saturate(${box?.color ? box.color[0] : 0}%) hue-rotate(${box?.color ? box.color[1] : 0}deg);
       `}>
       ${!box.icon ? box.text : ""}
     </div>
@@ -370,7 +363,7 @@ const drawDragged = (box, mouse) => box === null ? "" : html`
       align-items: center;
       font-size: xx-large;
       justify-content: center;
-      filter: sepia(100%) saturate(${box.data.color[0]}%) hue-rotate(${box.data.color[1]}deg);
+      filter: sepia(100%) saturate(${box?.data?.color ? box?.data?.color[0] : 0}%) hue-rotate(${box?.data?.color ? box?.data?.color[1] : 0}deg);
       `}>
       
       ${!box.data.icon ? box.data.text : ""}
