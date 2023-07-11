@@ -493,6 +493,10 @@ function renderLines(domElement) {
 
  animate();
 
+ window.onresize = function(){
+  renderer.setSize(domElement.clientWidth,domElement.clientHeight);
+ }
+
  return scene;
 }
 
