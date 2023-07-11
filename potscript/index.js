@@ -13,7 +13,7 @@ import { OrbitControls } from 'orbitControls';
 import { editors } from "./editors.js";
 import { bezierEasing } from "./bezierEasing.js";
 import { elsAtLoc } from "./elsAtLoc.js"
-
+import { noise } from "./noise.js";
 
 function svg2url(s){
   let ss = `
@@ -49,6 +49,17 @@ function makeIcon(box){
         s += i+" ";
         s += (50-y*50)+" "
       };
+      s += `" fill="none" stroke="black" stroke-width="3"/>`
+      return svg2url(s);
+    }else if (box.type == 'noise'){
+      let {frequency,phase,amplitude,shift} = box;
+      let s = `<path d="M `;
+      for (let i = 0; i < 100; i++){
+        let t = i/100;
+        let y = noise((t+phase) * frequency)*amplitude + shift;
+        s += i+" ";
+        s += (100-y*100)+" "
+      }
       s += `" fill="none" stroke="black" stroke-width="3"/>`
       return svg2url(s);
     }else if (box.type == 'shape'){
@@ -112,6 +123,15 @@ const STATE = {
       handle1: [.5, 1],
       end: 1,
       scale: 1,
+      opera: "nd",
+      color: [200,0]
+    },
+    {
+      type: "noise",
+      frequency: 1,
+      amplitude: 1,
+      phase: 0,
+      shift: 0,
       opera: "nd",
       color: [200,0]
     },
@@ -190,7 +210,12 @@ const STATE = {
       type: "plus",
       opera: "tor",
       color: [200,30]
-    },    
+    },  
+    { 
+      type: "composite",
+      opera: "tor",
+      color: [200,30]
+    },
     // { 
     //   type: "macro",
     //   value: "",
@@ -271,18 +296,11 @@ const box = (box, index) => html`
       background-position: center;
       border: 1px solid black;
       border-radius: 3px; 
-<<<<<<< HEAD:pourth/index.js
       display: "flex";
       align-items: "center";
       font-size: "xx-large";
       justify-content: "center";
       filter: sepia(100%) saturate(${box.color[0]}%) hue-rotate(${box.color[1]}deg);
-=======
-      display: flex;
-      align-items: center;
-      font-size: xx-large;
-      justify-content: center;
->>>>>>> 2006b1a07de5f9e3f0ab34a020803ccc8abcc14e:potscript/index.js
     `}>
     ${!box.icon ? box.text : ""}
   </div>

@@ -1,5 +1,7 @@
 import {boolean} from "./boolean.js"
 import {bezierEasing} from "./bezierEasing.js"
+import { noise } from "./noise.js";
+
 function expandMacros(programs, name){
   let out = [];
   for (let i = 0; i < programs[name].length; i++){
@@ -101,6 +103,9 @@ let funcMap = {
   'multiply':(f,g)=>(t)=>{
     return f(t)*g(t);
   },
+  'composite':(f,g)=>(t)=>{
+    return f(g(t));
+  },
   'plus':(f,g)=>(t)=>{
     return f(t)+g(t);
   },
@@ -182,6 +187,11 @@ export function runProgram({ programs }) {
           const val = bezierEasing(start,handle0,handle1,end)(t);
           return val*scale;
         });
+      }else if (type == 'noise'){
+        let {frequency,phase,amplitude,shift} = prgm[i];
+        stack.push(function(t){
+          return noise((t+phase) * frequency )*amplitude + shift;
+        })
       }
     }else if (opera == 'tor'){
       if (type == 'warp'){
@@ -313,3 +323,6 @@ function getResampledBySpacing(poly0,spacing) {
   if(poly.length) poly.push(poly0[poly0.length-1]);
   return poly;
 }
+
+
+
