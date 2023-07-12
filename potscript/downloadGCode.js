@@ -8,8 +8,6 @@ export function downloadGCode({ scale, height, layers }) {
    const totalHeight = scale*height;
    const layerHeight = totalHeight/layers;
 
-   console.log(layerHeight);
-
 
    const lines = [];
    let lastPt = null;
@@ -23,10 +21,10 @@ export function downloadGCode({ scale, height, layers }) {
             let [ x, y, z ] = pt;
             z += layerHeight;
             if (i === 0) {
-               lines.push(`G1 X${x} Y${y} Z${z} F1998 E${totalE}`);
+               lines.push(`G1 X${x} Y${y} Z${z} F1998 E${totalE}`); //add some retraction when going to new curve
             } 
 
-            const eDelta = lastPt ? dist(lastPt, pt)/8 : 0;
+            const eDelta = i > 0 ? dist(lastPt, pt)/8 : 0;
             totalE += eDelta
          
             lines.push(`G1 X${x} Y${y} Z${z} F1998 E${totalE}`);
@@ -53,7 +51,7 @@ export function downloadGCode({ scale, height, layers }) {
     M84 ; disable motors
    `
 
-   console.log(gcode);
+   // console.log(gcode);
    download("pot-gcode", "gcode", gcode);
 }
 
