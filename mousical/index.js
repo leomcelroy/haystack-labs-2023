@@ -180,34 +180,34 @@ function drawNote(analyser, audioContext) {
   // }
 
   if (autoCorrelateValue === -1) {
-    console.log('Too quiet...');
-    return;
+    // console.log('Too quiet...');
+    valueToDisplay = 0;
   }
 
-  console.log(valueToDisplay);
+  // console.log(valueToDisplay);
 
   document.querySelector('.note').innerText = valueToDisplay + " hz";
 
-  if (Math.abs(valueToDisplay - 850) < 30) {
+  if (Math.abs(valueToDisplay - 960) < 20) {
     let event = new KeyboardEvent('keydown', { keyCode: 37 });
 
     document.dispatchEvent(event);
   }
 
-  if (Math.abs(valueToDisplay - 950) < 30) {
+  if (Math.abs(valueToDisplay - 1000) < 20) {
     let event = new KeyboardEvent('keydown', { keyCode: 38 });
 
     document.dispatchEvent(event);
   }
 
-  if (Math.abs(valueToDisplay - 1050) < 30) {
+  if (Math.abs(valueToDisplay - 1100) < 20) {
     let event = new KeyboardEvent('keydown', { keyCode: 39 });
 
     document.dispatchEvent(event);
   }
 
 
-  if (Math.abs(valueToDisplay - 1150) < 30) {
+  if (Math.abs(valueToDisplay - 1200) < 50) {
     let event = new KeyboardEvent('keydown', { keyCode: 40 });
 
     document.dispatchEvent(event);
@@ -260,10 +260,10 @@ function snake(canvas) {
   }
 
   function startGame() {
-      if (snake[0].x > 15 && direction == "right") snake[0].x = 0;
-      if (snake[0].x < 0 && direction == 'left') snake[0].x = 16;
-      if (snake[0].y > 15 && direction == "down") snake[0].y = 0;
-      if (snake[0].y < 0 && direction == 'up') snake[0].y = 16;
+      if (snake[0].x > 15) snake[0].x = 0;
+      if (snake[0].x < 0) snake[0].x = 15;
+      if (snake[0].y > 15) snake[0].y = 0;
+      if (snake[0].y < 0) snake[0].y = 15;
 
       createBG();
       createSnake();
