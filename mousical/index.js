@@ -292,6 +292,6 @@ function snake(canvas) {
       snake.unshift(newHead);
   }
 
-  let game = setInterval(startGame, 100);
+  setInterval(startGame, 100);
 }
 
